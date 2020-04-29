@@ -31,9 +31,9 @@ successor
 	
 	^aNumber successor! !
 
-!I class methodsFor: 'operation' stamp: 'MF 4/28/2020 17:44:59'!
-- anII 
-	^self.! !
+!I class methodsFor: 'operation' stamp: 'MF 4/29/2020 18:01:54'!
+- aNumber 
+	^self error: self descripcionDeErrorDeNumerosNegativosNoSoportados.! !
 
 !I class methodsFor: 'operation' stamp: 'MF 4/28/2020 18:15:43'!
 / aNumber 
@@ -43,6 +43,14 @@ successor
 	
 	! !
 
+!I class methodsFor: 'operation' stamp: 'MF 4/29/2020 17:53:11'!
+substractFrom: aNumber 
+	^aNumber previous ! !
+
+
+!I class methodsFor: 'errors' stamp: 'MF 4/29/2020 18:02:24'!
+descripcionDeErrorDeNoSePuedeDividirPorUnNumeroMayor
+	self shouldBeImplemented.! !
 
 !I class methodsFor: 'errors' stamp: 'MF 4/28/2020 17:36:17'!
 descripcionDeErrorDeNumerosNegativosNoSoportados
@@ -77,12 +85,14 @@ previous
 
 	^self previous + aNumber successor! !
 
-!II class methodsFor: 'operation' stamp: 'AM 4/27/2020 21:57:58'!
+!II class methodsFor: 'operation' stamp: 'MF 4/29/2020 18:01:21'!
 - aNumber 
-	
-	aNumber = I
-		ifTrue: [^self previous]
-		ifFalse:[^self previous - aNumber previous]! !
+
+	^aNumber substractFrom: self! !
+
+!II class methodsFor: 'operation' stamp: 'MF 4/29/2020 17:57:18'!
+substractFrom: aNumber
+	^aNumber previous - self previous! !
 
 
 !classDefinition: #III category: #'Numeros de Peano'!
