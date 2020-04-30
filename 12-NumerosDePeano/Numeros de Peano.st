@@ -11,6 +11,16 @@ DenotativeObject subclass: #I
 I class
 	instanceVariableNames: ''!
 
+!I class methodsFor: 'base' stamp: 'DL 4/29/2020 21:00:06'!
+> aNumber
+	
+	^false.! !
+
+!I class methodsFor: 'base' stamp: 'DL 4/29/2020 21:14:47'!
+greaterThan: aNumber
+
+	^true.! !
+
 !I class methodsFor: 'base' stamp: 'MF 4/28/2020 17:19:32'!
 next
 
@@ -35,11 +45,22 @@ successor
 - aNumber 
 	^self error: self descripcionDeErrorDeNumerosNegativosNoSoportados.! !
 
-!I class methodsFor: 'operation' stamp: 'MF 4/28/2020 18:15:43'!
+!I class methodsFor: 'operation' stamp: 'DL 4/29/2020 21:47:24'!
 / aNumber 
+
 	self = aNumber 
+	
 		ifTrue:[^I]
-		ifFalse:[^((self - aNumber) / aNumber) successor].
+		
+		ifFalse:[
+			
+			aNumber > self
+			
+			ifTrue: [^self error: self descripcionDeErrorDeNoSePuedeDividirPorUnNumeroMayor.]
+
+			ifFalse: [^((self - aNumber) / aNumber) successor.]
+					
+			].
 	
 	! !
 
@@ -48,9 +69,9 @@ substractFrom: aNumber
 	^aNumber previous ! !
 
 
-!I class methodsFor: 'errors' stamp: 'MF 4/29/2020 18:02:24'!
+!I class methodsFor: 'errors' stamp: 'DL 4/29/2020 19:38:06'!
 descripcionDeErrorDeNoSePuedeDividirPorUnNumeroMayor
-	self shouldBeImplemented.! !
+	^'Cannot be divided by a larger number'! !
 
 !I class methodsFor: 'errors' stamp: 'MF 4/28/2020 17:36:17'!
 descripcionDeErrorDeNumerosNegativosNoSoportados
@@ -69,6 +90,11 @@ I subclass: #II
 !classDefinition: 'II class' category: #'Numeros de Peano'!
 II class
 	instanceVariableNames: ''!
+
+!II class methodsFor: 'base' stamp: 'DL 4/29/2020 21:18:29'!
+greaterThan: aNumber
+
+	^aNumber previous > self previous.! !
 
 !II class methodsFor: 'base' stamp: 'AM 4/27/2020 21:42:53'!
 previous
@@ -89,6 +115,11 @@ previous
 - aNumber 
 
 	^aNumber substractFrom: self! !
+
+!II class methodsFor: 'operation' stamp: 'DL 4/29/2020 21:19:51'!
+> aNumber
+
+	^aNumber greaterThan: self.! !
 
 !II class methodsFor: 'operation' stamp: 'MF 4/29/2020 17:57:18'!
 substractFrom: aNumber
