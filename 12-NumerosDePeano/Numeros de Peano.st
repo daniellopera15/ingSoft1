@@ -45,24 +45,17 @@ successor
 - aNumber 
 	^self error: self descripcionDeErrorDeNumerosNegativosNoSoportados.! !
 
-!I class methodsFor: 'operation' stamp: 'DL 4/29/2020 21:47:24'!
+!I class methodsFor: 'operation' stamp: 'MF 4/30/2020 14:33:27'!
 / aNumber 
 
-	self = aNumber 
-	
-		ifTrue:[^I]
+	aNumber > self
+		ifTrue: [^self error: self descripcionDeErrorDeNoSePuedeDividirPorUnNumeroMayor ]
 		
-		ifFalse:[
-			
-			aNumber > self
-			
-			ifTrue: [^self error: self descripcionDeErrorDeNoSePuedeDividirPorUnNumeroMayor.]
+		ifFalse: [^self calculateQuotient: aNumber].! !
 
-			ifFalse: [^((self - aNumber) / aNumber) successor.]
-					
-			].
-	
-	! !
+!I class methodsFor: 'operation' stamp: 'MF 4/30/2020 14:27:34'!
+calculateQuotient: aNumber 
+	^self! !
 
 !I class methodsFor: 'operation' stamp: 'MF 4/29/2020 17:53:11'!
 substractFrom: aNumber 
@@ -120,6 +113,19 @@ previous
 > aNumber
 
 	^aNumber greaterThan: self.! !
+
+!II class methodsFor: 'operation' stamp: 'MF 4/30/2020 14:32:59'!
+calculateQuotient: aNumber
+	|remaining|
+
+	self = aNumber
+		ifTrue: [^I]
+		ifFalse: [
+				remaining := self - aNumber.		
+				self > remaining
+					ifTrue: [^(remaining/aNumber) successor]
+					ifFalse: [^I].
+			].! !
 
 !II class methodsFor: 'operation' stamp: 'MF 4/29/2020 17:57:18'!
 substractFrom: aNumber
