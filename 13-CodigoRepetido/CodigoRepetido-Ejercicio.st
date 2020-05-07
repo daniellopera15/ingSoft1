@@ -159,7 +159,7 @@ expectFailFrom: block ofType: exceptionType thenAssert: assertionBlock
 		do: assertionBlock.! !
 
 
-!CustomerBookTest methodsFor: 'CustomerBook assertions' stamp: 'MF 5/7/2020 13:50:33'!
+!CustomerBookTest methodsFor: 'CustomerBook checking' stamp: 'MF 5/7/2020 13:50:33'!
 assertCustomerBook: aCustomerBook hasActiveCountOf: expectedActiveCount hasSuspendedCountOf: expectedSuspendCount hasCustomerCountOf: expectedCustomersCount
 
 	self assert: expectedActiveCount equals: aCustomerBook numberOfActiveCustomers.
