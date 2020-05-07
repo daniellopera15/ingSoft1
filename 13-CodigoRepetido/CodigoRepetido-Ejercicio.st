@@ -72,10 +72,10 @@ test04CanNotRemoveAnInvalidCustomer
 			self assert: (customerBook includesCustomerNamed: johnLennon) ].
 ! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'DL 5/4/2020 21:25:34'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'MF 5/7/2020 13:58:01'!
 test05SuspendingACustomerShouldNotRemoveItFromCustomerBook
 
-	| customerBook paulMcCartney|
+	| customerBook paulMcCartney |
 	
 	customerBook := CustomerBook new.
 	paulMcCartney := 'Paul McCartney'.
@@ -83,15 +83,14 @@ test05SuspendingACustomerShouldNotRemoveItFromCustomerBook
 	customerBook addCustomerNamed: paulMcCartney.
 	customerBook suspendCustomerNamed: paulMcCartney.
 
-	self assertCustomerCount: customerBook withActive: 0 withSuspend: 1 withCustomer: 1. 
+	self assertCustomerBook: customerBook 
+		hasActiveCountOf: 0 
+		hasSuspendedCountOf: 1 
+		hasCustomerCountOf: 1.
 		
-	self assert: (customerBook includesCustomerNamed: paulMcCartney).
-	
+	self assert: (customerBook includesCustomerNamed: paulMcCartney).! !
 
-	
-! !
-
-!CustomerBookTest methodsFor: 'testing' stamp: 'DL 5/4/2020 21:26:15'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'MF 5/7/2020 13:56:49'!
 test06RemovingASuspendedCustomerShouldRemoveItFromCustomerBook
 
 	| customerBook paulMcCartney|
@@ -103,13 +102,12 @@ test06RemovingASuspendedCustomerShouldRemoveItFromCustomerBook
 	customerBook suspendCustomerNamed: paulMcCartney.
 	customerBook removeCustomerNamed: paulMcCartney.
 	
-	self assertCustomerCount: customerBook withActive: 0 withSuspend: 0 withCustomer: 0.
+	self assertCustomerBook: customerBook 
+		hasActiveCountOf: 0 
+		hasSuspendedCountOf: 0 
+		hasCustomerCountOf: 0.
 
-	self deny: (customerBook includesCustomerNamed: paulMcCartney).
-
-
-	
-! !
+	self deny: (customerBook includesCustomerNamed: paulMcCartney).! !
 
 !CustomerBookTest methodsFor: 'testing' stamp: 'DL 5/4/2020 21:17:20'!
 test07CanNotSuspendAnInvalidCustomer
@@ -141,14 +139,7 @@ test08CanNotSuspendAnAlreadySuspendedCustomer
 ! !
 
 
-!CustomerBookTest methodsFor: 'as yet unclassified' stamp: 'DL 5/4/2020 21:24:35'!
-assertCustomerCount: customerBook withActive: active withSuspend: suspend withCustomer: customers
-
-	self assert: active equals: customerBook numberOfActiveCustomers.
-	self assert: suspend equals: customerBook numberOfSuspendedCustomers.
-	self assert: customers equals: customerBook numberOfCustomers.! !
-
-!CustomerBookTest methodsFor: 'as yet unclassified' stamp: 'DL 5/4/2020 20:34:09'!
+!CustomerBookTest methodsFor: 'block checks' stamp: 'DL 5/4/2020 20:34:09'!
 executionOf: aClosure shouldNotTakeMoreThan: timeLimitInMillis
 
 	|millisecondsBeforeRunning millisecondsAfterRunning|
@@ -159,13 +150,21 @@ executionOf: aClosure shouldNotTakeMoreThan: timeLimitInMillis
 	
 	self assert: (millisecondsAfterRunning-millisecondsBeforeRunning) < (timeLimitInMillis * millisecond)! !
 
-!CustomerBookTest methodsFor: 'as yet unclassified' stamp: 'DL 5/4/2020 21:14:45'!
+!CustomerBookTest methodsFor: 'block checks' stamp: 'DL 5/4/2020 21:14:45'!
 expectFailFrom: block ofType: exceptionType thenAssert: assertionBlock
 
 [ block value.
 	self fail ]
 		on: exceptionType 
 		do: assertionBlock.! !
+
+
+!CustomerBookTest methodsFor: 'CustomerBook assertions' stamp: 'MF 5/7/2020 13:50:33'!
+assertCustomerBook: aCustomerBook hasActiveCountOf: expectedActiveCount hasSuspendedCountOf: expectedSuspendCount hasCustomerCountOf: expectedCustomersCount
+
+	self assert: expectedActiveCount equals: aCustomerBook numberOfActiveCustomers.
+	self assert: expectedSuspendCount equals: aCustomerBook numberOfSuspendedCustomers.
+	self assert: expectedCustomersCount equals: aCustomerBook numberOfCustomers.! !
 
 
 !classDefinition: #CustomerBook category: #'CodigoRepetido-Ejercicio'!
@@ -194,6 +193,17 @@ initialize
 	suspended:= OrderedCollection new.! !
 
 
+!CustomerBook methodsFor: 'signaling' stamp: 'DL 5/4/2020 21:32:29'!
+signalCustomerAlreadyExists 
+
+	self error: self class customerAlreadyExistsErrorMessage! !
+
+!CustomerBook methodsFor: 'signaling' stamp: 'DL 5/4/2020 21:32:33'!
+signalCustomerNameCannotBeEmpty 
+
+	self error: self class customerCanNotBeEmptyErrorMessage ! !
+
+
 !CustomerBook methodsFor: 'customer management' stamp: 'DL 5/4/2020 21:32:46'!
 addCustomerNamed: aName
 
@@ -201,26 +211,6 @@ addCustomerNamed: aName
 	(self includesCustomerNamed: aName) ifTrue: [ self signalCustomerAlreadyExists ].
 	
 	active add: aName ! !
-
-!CustomerBook methodsFor: 'customer management' stamp: 'DL 5/4/2020 21:51:45'!
-numberOfActiveCustomers
-	
-	^self numberOfCustomersInList: active.! !
-
-!CustomerBook methodsFor: 'customer management' stamp: 'DL 5/4/2020 21:32:04'!
-numberOfCustomers
-	
-	^self numberOfActiveCustomers + self numberOfSuspendedCustomers ! !
-
-!CustomerBook methodsFor: 'customer management' stamp: 'DL 5/4/2020 21:49:47'!
-numberOfCustomersInList: customerList
-	
-	^customerList size.! !
-
-!CustomerBook methodsFor: 'customer management' stamp: 'DL 5/4/2020 21:50:56'!
-numberOfSuspendedCustomers
-	
-	^self numberOfCustomersInList: suspended.! !
 
 !CustomerBook methodsFor: 'customer management' stamp: 'DL 5/4/2020 21:42:29'!
 removeCustomerNamed: aName 
@@ -231,27 +221,17 @@ removeCustomerNamed: aName
 	^ NotFound signal.
 ! !
 
-!CustomerBook methodsFor: 'customer management' stamp: 'DL 5/4/2020 21:44:31'!
-removeFrom: customerList withName: aName
+!CustomerBook methodsFor: 'customer management' stamp: 'MF 5/7/2020 13:29:53'!
+removeFrom: aCustomerList withName: aName
 
-	1 to: customerList size do: 
+	1 to: aCustomerList size do: 
 	[ :index |
-		aName = (customerList at: index)
+		aName = (aCustomerList at: index)
 			ifTrue: [
-				customerList removeAt: index.
+				aCustomerList removeAt: index.
 				^ aName 
 			] 
 	].! !
-
-!CustomerBook methodsFor: 'customer management' stamp: 'DL 5/4/2020 21:32:29'!
-signalCustomerAlreadyExists 
-
-	self error: self class customerAlreadyExistsErrorMessage! !
-
-!CustomerBook methodsFor: 'customer management' stamp: 'DL 5/4/2020 21:32:33'!
-signalCustomerNameCannotBeEmpty 
-
-	self error: self class customerCanNotBeEmptyErrorMessage ! !
 
 !CustomerBook methodsFor: 'customer management' stamp: 'DL 5/4/2020 21:54:37'!
 suspendCustomerNamed: aName 
@@ -262,6 +242,27 @@ suspendCustomerNamed: aName
 	
 	suspended add: aName
 ! !
+
+
+!CustomerBook methodsFor: 'customer counting' stamp: 'DL 5/4/2020 21:51:45'!
+numberOfActiveCustomers
+	
+	^self numberOfCustomersInList: active.! !
+
+!CustomerBook methodsFor: 'customer counting' stamp: 'DL 5/4/2020 21:32:04'!
+numberOfCustomers
+	
+	^self numberOfActiveCustomers + self numberOfSuspendedCustomers ! !
+
+!CustomerBook methodsFor: 'customer counting' stamp: 'MF 5/7/2020 13:29:13'!
+numberOfCustomersInList: aCustomerList
+	
+	^aCustomerList size.! !
+
+!CustomerBook methodsFor: 'customer counting' stamp: 'DL 5/4/2020 21:50:56'!
+numberOfSuspendedCustomers
+	
+	^self numberOfCustomersInList: suspended.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
