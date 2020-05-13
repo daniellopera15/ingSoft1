@@ -432,11 +432,10 @@ Numero subclass: #Entero
 	
 	^self class with: value // aDivisor integerValue! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'DL 5/11/2020 21:14:09'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'DL 5/13/2020 15:36:03'!
 addFraction: anAdder 
 
-	^Fraccion with: (self * anAdder denominator) + anAdder numerator over: anAdder denominator.
-
+	^((self * anAdder denominator) + anAdder numerator) / anAdder denominator.
 
 	
 ! !
@@ -449,13 +448,12 @@ addInteger: anAdder
 	
 ! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'DL 5/11/2020 22:27:52'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'DL 5/13/2020 15:36:53'!
 divideFromFraction: aDivisor.
 	
-	^Fraccion with: aDivisor numerator over: self * aDivisor denominator.
-	! !
+	^aDivisor numerator / (self * aDivisor denominator).	! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'DL 5/11/2020 22:16:04'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'DL 5/13/2020 15:38:59'!
 divideFromInteger: aDivisor.
 	
 	^Fraccion with: aDivisor over: self.! !
@@ -479,20 +477,20 @@ greatestCommonDivisorWith: anEntero
 	
 	^self class with: (value gcd: anEntero integerValue)! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'DL 5/11/2020 21:08:07'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'DL 5/13/2020 15:52:50'!
 multiplyWithFraction: aMultiplier
 
-	^Fraccion with: self * aMultiplier numerator over: aMultiplier denominator.! !
+	^(self * aMultiplier numerator) / aMultiplier denominator.! !
 
 !Entero methodsFor: 'arithmetic operations' stamp: 'DL 5/11/2020 21:08:17'!
 multiplyWithInteger: aMultiplier 
 	
 	^self class with: value * aMultiplier integerValue.! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'DL 5/11/2020 21:33:21'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'DL 5/13/2020 15:54:11'!
 substractFromFraction: aFractionToSubstract 
 	
-	^Fraccion with: aFractionToSubstract numerator - (self * aFractionToSubstract denominator) over: aFractionToSubstract denominator.! !
+	^(aFractionToSubstract numerator - (self * aFractionToSubstract denominator)) / (aFractionToSubstract denominator).! !
 
 !Entero methodsFor: 'arithmetic operations' stamp: 'DL 5/11/2020 22:03:35'!
 substractFromInteger: aIntegerToSubstract 
@@ -604,21 +602,20 @@ addFraction: anAdder
 	
 	^newNumerator / newDenominator ! !
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'DL 5/11/2020 21:16:57'!
-addInteger: anAdder 
-	
-	^Fraccion with: (anAdder * self denominator) + self numerator over: self denominator! !
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'DL 5/13/2020 15:31:56'!
+addInteger: anAdder
+
+	^((anAdder * self denominator) + self numerator) / self denominator.! !
 
 !Fraccion methodsFor: 'arithmetic operations' stamp: 'DL 5/11/2020 22:24:24'!
 divideFromFraction: aDivisor.
 	
 	^(aDivisor numerator * denominator) / (aDivisor denominator * numerator).! !
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'DL 5/11/2020 22:26:14'!
-divideFromInteger: aDivisor.
-	
-	^Fraccion with: self denominator * aDivisor over: self numerator.
-	! !
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'DL 5/13/2020 15:33:01'!
+divideFromInteger: aDivisor
+
+	^(self denominator * aDivisor) / self numerator.	! !
 
 !Fraccion methodsFor: 'arithmetic operations' stamp: 'DL 5/11/2020 21:07:34'!
 multiplyWithFraction: aMultiplier
@@ -626,10 +623,10 @@ multiplyWithFraction: aMultiplier
 	^(numerator * aMultiplier numerator) / (denominator * aMultiplier denominator).
 	! !
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'DL 5/11/2020 21:10:55'!
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'DL 5/13/2020 15:34:04'!
 multiplyWithInteger: aMultiplier
 
-	^Fraccion with: self numerator * aMultiplier over: self denominator! !
+	^(self numerator * aMultiplier) / self denominator.! !
 
 !Fraccion methodsFor: 'arithmetic operations' stamp: 'DL 5/11/2020 21:35:05'!
 substractFromFraction: aFractionToSubstract 
@@ -642,11 +639,10 @@ substractFromFraction: aFractionToSubstract
 	^newNumerator / newDenominator 
 ! !
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'DL 5/11/2020 21:36:20'!
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'DL 5/13/2020 15:34:52'!
 substractFromInteger: aIntegerToSubstract 
 	
-	^Fraccion with: (self denominator * aIntegerToSubstract) - self numerator over: self denominator.
-! !
+	^((self denominator * aIntegerToSubstract) - self numerator) / self denominator.! !
 
 
 !Fraccion methodsFor: 'comparing' stamp: 'HernanWilkinson 5/7/2016 20:42'!
