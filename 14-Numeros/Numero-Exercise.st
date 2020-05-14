@@ -432,10 +432,15 @@ Numero subclass: #Entero
 	
 	^self class with: value // aDivisor integerValue! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'MF 5/14/2020 14:46:58'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'MF 5/14/2020 15:03:28'!
 addFraction: aFractionToAdd 
 
-	^((self * aFractionToAdd denominator) + aFractionToAdd numerator) / aFractionToAdd denominator.
+	|newNumerator newDenominator|
+	
+	newNumerator := (self * aFractionToAdd denominator) + aFractionToAdd numerator.
+	newDenominator := aFractionToAdd denominator.
+
+	^newNumerator/newDenominator .
 
 	
 ! !
@@ -448,12 +453,17 @@ addInteger: anIntegerToAdd
 	
 ! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'MF 5/14/2020 14:55:54'!
-divideThisFraction: aFractionToDivide.
-	
-	^aFractionToDivide numerator / (self * aFractionToDivide denominator).	! !
+!Entero methodsFor: 'arithmetic operations' stamp: 'MF 5/14/2020 15:04:54'!
+divideThisFraction: aFractionToDivide
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'MF 5/14/2020 14:56:03'!
+	|newNumerator newDenominator|
+
+	newNumerator := aFractionToDivide numerator.
+	newDenominator := self * aFractionToDivide denominator.
+	
+	^ newNumerator/ newDenominator.	! !
+
+!Entero methodsFor: 'arithmetic operations' stamp: 'MF 5/14/2020 15:06:04'!
 divideThisInteger: anIntegerToDivide.
 	
 	^Fraccion with: anIntegerToDivide over: self.! !
@@ -477,20 +487,30 @@ greatestCommonDivisorWith: anEntero
 	
 	^self class with: (value gcd: anEntero integerValue)! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'MF 5/14/2020 14:52:43'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'MF 5/14/2020 15:07:22'!
 multiplyWithFraction: aFractionToMultiplyWith
 
-	^(self * aFractionToMultiplyWith numerator) / aFractionToMultiplyWith denominator.! !
+	|newNumerator newDenominator|
+
+	newNumerator := self * aFractionToMultiplyWith numerator.
+	newDenominator := aFractionToMultiplyWith denominator.
+
+	^ newNumerator / newDenominator.! !
 
 !Entero methodsFor: 'arithmetic operations' stamp: 'MF 5/14/2020 14:52:31'!
 multiplyWithInteger: anIntegerToMultiplyWith 
 	
 	^self class with: value * anIntegerToMultiplyWith integerValue.! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'MF 5/14/2020 14:49:43'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'MF 5/14/2020 15:09:28'!
 substractFromFraction: aFractionToSubstractFrom 
+
+	| newNumerator newDenominator |
 	
-	^(aFractionToSubstractFrom numerator - (self * aFractionToSubstractFrom denominator)) / (aFractionToSubstractFrom denominator).! !
+	newNumerator := aFractionToSubstractFrom numerator - (self * aFractionToSubstractFrom denominator).
+	newDenominator := (aFractionToSubstractFrom denominator).
+	
+	^ newNumerator / newDenominator.! !
 
 !Entero methodsFor: 'arithmetic operations' stamp: 'MF 5/14/2020 14:49:50'!
 substractFromInteger: aIntegerToSubstractFrom 
@@ -602,31 +622,56 @@ addFraction: aFractionToAdd
 	
 	^newNumerator / newDenominator ! !
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'MF 5/14/2020 14:48:56'!
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'MF 5/14/2020 15:10:35'!
 addInteger: anIntegerToAdd
 
-	^((anIntegerToAdd * self denominator) + self numerator) / self denominator.! !
-
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'MF 5/14/2020 14:56:17'!
-divideThisFraction: aFractionToDivide.
+	| newNumerator newDenominator |
 	
-	^(aFractionToDivide numerator * denominator) / (aFractionToDivide denominator * numerator).! !
+	newNumerator := ((anIntegerToAdd * self denominator) + self numerator).
+	newDenominator := self denominator.
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'MF 5/14/2020 14:56:27'!
+	^ newNumerator / newDenominator.! !
+
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'MF 5/14/2020 15:11:53'!
+divideThisFraction: aFractionToDivide
+
+	| newNumerator newDenominator |
+	
+	newNumerator := aFractionToDivide numerator * denominator.
+	newDenominator := aFractionToDivide denominator * numerator.
+		
+	^ newNumerator / newDenominator.! !
+
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'MF 5/14/2020 15:12:50'!
 divideThisInteger: anIntegerToDivide
 
-	^(self denominator * anIntegerToDivide) / self numerator.	! !
+	| newNumerator newDenominator |
+	
+	newNumerator := self denominator * anIntegerToDivide.
+	newDenominator := self numerator.
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'MF 5/14/2020 14:52:05'!
+	^ newNumerator / newDenominator.	! !
+
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'MF 5/14/2020 15:13:46'!
 multiplyWithFraction: aFractionToMultiplyWith
 
-	^(numerator * aFractionToMultiplyWith numerator) / (denominator * aFractionToMultiplyWith denominator).
+	| newNumerator newDenominator |
+	
+	newNumerator := numerator * aFractionToMultiplyWith numerator.
+	newDenominator := denominator * aFractionToMultiplyWith denominator.
+
+	^ newNumerator / newDenominator.
 	! !
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'MF 5/14/2020 14:52:18'!
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'MF 5/14/2020 15:14:35'!
 multiplyWithInteger: anIntegerToMultiplyWith
 
-	^(self numerator * anIntegerToMultiplyWith) / self denominator.! !
+	| newNumerator newDenominator |
+
+	newNumerator := self numerator * anIntegerToMultiplyWith.
+	newDenominator := self denominator.
+
+	^ newNumerator / newDenominator.! !
 
 !Fraccion methodsFor: 'arithmetic operations' stamp: 'DL 5/11/2020 21:35:05'!
 substractFromFraction: aFractionToSubstract 
@@ -639,10 +684,15 @@ substractFromFraction: aFractionToSubstract
 	^newNumerator / newDenominator 
 ! !
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'MF 5/14/2020 14:51:02'!
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'MF 5/14/2020 15:16:05'!
 substractFromInteger: anIntegerToSubstractFrom 
+
+	| newNumerator newDenominator |
 	
-	^((self denominator * anIntegerToSubstractFrom) - self numerator) / self denominator.! !
+	newNumerator := (self denominator * anIntegerToSubstractFrom) - self numerator.
+	newDenominator := self denominator.
+	
+	^ newNumerator / newDenominator.! !
 
 
 !Fraccion methodsFor: 'comparing' stamp: 'HernanWilkinson 5/7/2016 20:42'!
