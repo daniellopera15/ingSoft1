@@ -156,25 +156,30 @@ Object subclass: #OOStack
 initializeStack
 	stack := OrderedCollection new.! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'MF 5/14/2020 21:11:11'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'DL 5/16/2020 20:39:03'!
 isEmpty
+
 	^self size = 0.! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'MF 5/14/2020 21:17:52'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'DL 5/16/2020 20:34:45'!
 pop
-	^self isEmpty ifTrue: [self error: (self class stackEmptyErrorDescription)] ifFalse: [stack removeLast] .! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'MF 5/14/2020 20:56:04'!
+	^(OOStack subclasses detect: [:aClass | aClass isEmpty: stack]) pop: stack.! !
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'DL 5/16/2020 20:19:41'!
 push: anObject
+
 	stack addLast: anObject.! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'MF 5/14/2020 21:10:33'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'DL 5/16/2020 20:37:06'!
 size
+
 	^stack size.! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'MF 5/14/2020 21:19:30'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'DL 5/16/2020 20:37:18'!
 top
-	^self isEmpty ifTrue: [self error: (self class stackEmptyErrorDescription )] ifFalse: [stack last].! !
+
+	^(self class subclasses detect: [:aClass | aClass isEmpty: stack]) top: stack.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -190,6 +195,64 @@ new
 stackEmptyErrorDescription
 	
 	^ 'Stack is empty'! !
+
+
+!classDefinition: #EmptyStack category: #'Stack-Exercise'!
+OOStack subclass: #EmptyStack
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'EmptyStack class' category: #'Stack-Exercise'!
+EmptyStack class
+	instanceVariableNames: ''!
+
+!EmptyStack class methodsFor: 'as yet unclassified' stamp: 'DL 5/16/2020 20:30:55'!
+isEmpty: stack
+
+	^stack size = 0.! !
+
+!EmptyStack class methodsFor: 'as yet unclassified' stamp: 'DL 5/16/2020 20:35:25'!
+pop: stack
+
+	^self error: OOStack stackEmptyErrorDescription.! !
+
+!EmptyStack class methodsFor: 'as yet unclassified' stamp: 'DL 5/16/2020 20:35:54'!
+top: stack
+
+	^self error: OOStack stackEmptyErrorDescription.! !
+
+
+!classDefinition: #FilledStack category: #'Stack-Exercise'!
+OOStack subclass: #FilledStack
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'FilledStack class' category: #'Stack-Exercise'!
+FilledStack class
+	instanceVariableNames: ''!
+
+!FilledStack class methodsFor: 'as yet unclassified' stamp: 'DL 5/16/2020 20:33:21'!
+isEmpty: stack
+
+	^stack size ~= 0.! !
+
+!FilledStack class methodsFor: 'as yet unclassified' stamp: 'DL 5/16/2020 20:33:42'!
+pop: stack
+
+	^stack removeLast.! !
+
+!FilledStack class methodsFor: 'as yet unclassified' stamp: 'DL 5/16/2020 20:36:15'!
+top: stack
+
+	^stack last.! !
 
 
 !classDefinition: #SentenceFinderByPrefix category: #'Stack-Exercise'!
