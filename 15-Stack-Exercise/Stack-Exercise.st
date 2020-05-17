@@ -147,34 +147,48 @@ TestCase subclass: #SentenceFinderByPrefixTest
 
 !classDefinition: #OOStack category: #'Stack-Exercise'!
 Object subclass: #OOStack
-	instanceVariableNames: 'stack'
+	instanceVariableNames: 'tope size'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'MF 5/14/2020 21:00:30'!
-initializeStack
-	stack := OrderedCollection new.! !
+!OOStack methodsFor: 'as yet unclassified' stamp: 'MF 5/17/2020 15:35:48'!
+initialize
+	tope := OOStackNullElement new.
+	size := 0! !
 
 !OOStack methodsFor: 'as yet unclassified' stamp: 'MF 5/14/2020 21:11:11'!
 isEmpty
 	^self size = 0.! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'MF 5/14/2020 21:17:52'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'MF 5/17/2020 16:33:23'!
 pop
-	^self isEmpty ifTrue: [self error: (self class stackEmptyErrorDescription)] ifFalse: [stack removeLast] .! !
+	
+	| newTope value |
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'MF 5/14/2020 20:56:04'!
+	newTope := tope dameElDeAbajo.
+	value := tope getValue.
+	
+	tope := newTope.
+	size := size - 1.
+	^value! !
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'MF 5/17/2020 16:26:52'!
 push: anObject
-	stack addLast: anObject.! !
+	|newElement|
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'MF 5/14/2020 21:10:33'!
+	newElement  := OOStackRealElement new initializeWith: anObject.
+	size := size + 1.
+	tope addAbove: newElement.
+	tope := newElement! !
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'MF 5/17/2020 15:35:56'!
 size
-	^stack size.! !
+	^size.! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'MF 5/14/2020 21:19:30'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'MF 5/17/2020 15:38:14'!
 top
-	^self isEmpty ifTrue: [self error: (self class stackEmptyErrorDescription )] ifFalse: [stack last].! !
+	^tope getValue.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -182,14 +196,94 @@ top
 OOStack class
 	instanceVariableNames: ''!
 
-!OOStack class methodsFor: 'error descriptions' stamp: 'MF 5/14/2020 20:59:33'!
-new
-	^self basicNew initializeStack! !
-
 !OOStack class methodsFor: 'error descriptions' stamp: 'HernanWilkinson 5/7/2012 11:51'!
 stackEmptyErrorDescription
 	
 	^ 'Stack is empty'! !
+
+
+!classDefinition: #OOStackElement category: #'Stack-Exercise'!
+Object subclass: #OOStackElement
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!OOStackElement methodsFor: 'as yet unclassified' stamp: 'MF 5/17/2020 15:53:37'!
+addAbove: aStackElement
+	aStackElement addBelow: self.
+	^aStackElement! !
+
+!OOStackElement methodsFor: 'as yet unclassified' stamp: 'MF 5/17/2020 15:46:37'!
+addBelow: aStackElement
+	^self subclassResponsibility ! !
+
+!OOStackElement methodsFor: 'as yet unclassified' stamp: 'MF 5/17/2020 15:58:37'!
+dameElDeAbajo
+	^self subclassResponsibility ! !
+
+!OOStackElement methodsFor: 'as yet unclassified' stamp: 'MF 5/17/2020 16:00:16'!
+getValue
+	^self subclassResponsibility ! !
+
+!OOStackElement methodsFor: 'as yet unclassified' stamp: 'MF 5/17/2020 16:17:30'!
+initializeWith: aValue
+	^self subclassResponsibility! !
+
+
+!classDefinition: #OOStackNullElement category: #'Stack-Exercise'!
+OOStackElement subclass: #OOStackNullElement
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!OOStackNullElement methodsFor: 'as yet unclassified' stamp: 'MF 5/17/2020 16:14:53'!
+addBelow
+	self error: OOStack stackEmptyErrorDescription
+! !
+
+!OOStackNullElement methodsFor: 'as yet unclassified' stamp: 'MF 5/17/2020 16:09:17'!
+dameElDeAbajo
+	self error: OOStack stackEmptyErrorDescription
+! !
+
+!OOStackNullElement methodsFor: 'as yet unclassified' stamp: 'MF 5/17/2020 16:15:26'!
+getValue
+	self error: OOStack stackEmptyErrorDescription
+! !
+
+!OOStackNullElement methodsFor: 'as yet unclassified' stamp: 'MF 5/17/2020 16:17:46'!
+initializeWith: aValue
+	self error: OOStack stackEmptyErrorDescription
+! !
+
+
+!classDefinition: #OOStackRealElement category: #'Stack-Exercise'!
+OOStackElement subclass: #OOStackRealElement
+	instanceVariableNames: 'value abajo'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!OOStackRealElement methodsFor: 'as yet unclassified' stamp: 'MF 5/17/2020 15:48:00'!
+addBelow: aStackElement
+	abajo := aStackElement ! !
+
+!OOStackRealElement methodsFor: 'as yet unclassified' stamp: 'MF 5/17/2020 15:58:16'!
+dameElDeAbajo
+	^abajo
+	! !
+
+!OOStackRealElement methodsFor: 'as yet unclassified' stamp: 'MF 5/17/2020 16:15:37'!
+getValue
+	^value 
+	! !
+
+!OOStackRealElement methodsFor: 'as yet unclassified' stamp: 'MF 5/17/2020 16:19:34'!
+initializeWith: aValue
+	value := aValue 
+	! !
 
 
 !classDefinition: #SentenceFinderByPrefix category: #'Stack-Exercise'!
