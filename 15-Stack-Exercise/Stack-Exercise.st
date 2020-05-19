@@ -144,6 +144,32 @@ TestCase subclass: #SentenceFinderByPrefixTest
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MF 5/18/2020 22:02:33'!
+test01
+	| sentencesStack sentenceFinderByPrefix prefixToFind result |
+	
+	sentencesStack := OOStack new.
+	sentencesStack push: 'winter is coming'.
+	sentencesStack push: 'The winds of Winter'.
+	sentencesStack push: 'winning is everything'.
+	sentencesStack push: 'Winter is here'.
+	sentenceFinderByPrefix := SentenceFinderByPrefix new initializeWithStack: sentencesStack.
+	prefixToFind := 'Wint'.
+		
+	result := sentenceFinderByPrefix find: prefixToFind.
+	
+	Assert that: result size isEqualTo: 1.
+	Assert that: (result at: 1) isEqualTo: 'Winter is here'.
+	
+	Assert that: sentencesStack pop isEqualTo: 'Winter is here'.
+	Assert that: sentencesStack pop isEqualTo: 'winning is everything'.
+	Assert that: sentencesStack pop isEqualTo: 'The winds of Winter'.
+	Assert that: sentencesStack pop isEqualTo: 'winter is coming'.
+
+		
+	
+! !
+
 
 !classDefinition: #OOStack category: #'Stack-Exercise'!
 Object subclass: #OOStack
@@ -152,12 +178,12 @@ Object subclass: #OOStack
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!OOStack methodsFor: 'stack operations' stamp: 'MF 5/18/2020 18:27:41'!
+!OOStack methodsFor: 'stack operations' stamp: 'MF 5/18/2020 22:07:11'!
 pop
 	
 	| newTope value |
 
-	newTope := topElement belowElement.
+	newTope := topElement getBelowElement.
 	value := topElement getValue.
 	
 	topElement := newTope.
@@ -297,7 +323,62 @@ addBelow: aStackElement
 
 !classDefinition: #SentenceFinderByPrefix category: #'Stack-Exercise'!
 Object subclass: #SentenceFinderByPrefix
-	instanceVariableNames: ''
+	instanceVariableNames: 'sentencesStack auxiliaryStack'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
+
+!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'MF 5/18/2020 22:21:05'!
+find: aPrefix
+
+	| matchesList sentence |
+	
+	( aPrefix isKindOf: String ) ifFalse: [self error: self class errorMessageCollaboratorIsNotAString].
+	( aPrefix isEmpty ) ifTrue: [self error: self class errorMessageEmptyPrefix].
+	( 0 < (aPrefix  indexOf: $ )) ifTrue: [self error: self class errorMessagePrefixWithSpaces].
+
+	matchesList := OrderedCollection new.
+	[ sentencesStack  isEmpty ] whileFalse: [
+		sentence := sentencesStack pop.
+		
+		(sentence beginsWith: aPrefix) ifTrue: [matchesList addLast: sentence].
+		
+		auxiliaryStack push: sentence.
+		].
+	
+	[ auxiliaryStack  isEmpty ] whileFalse: [
+		sentence := auxiliaryStack pop.
+				
+		sentencesStack push: sentence.
+		].
+	
+	^matchesList
+	
+! !
+
+!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'MF 5/18/2020 21:10:03'!
+initializeWithStack: aStack
+
+	"self validateThatStackHasSentences: aStack."
+	sentencesStack  := aStack.
+	auxiliaryStack := OOStack new.
+	
+! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'SentenceFinderByPrefix class' category: #'Stack-Exercise'!
+SentenceFinderByPrefix class
+	instanceVariableNames: ''!
+
+!SentenceFinderByPrefix class methodsFor: 'as yet unclassified' stamp: 'MF 5/18/2020 21:47:49'!
+errorMessageCollaboratorIsNotAString
+	^'Collaborator must be a String instance'! !
+
+!SentenceFinderByPrefix class methodsFor: 'as yet unclassified' stamp: 'MF 5/18/2020 21:44:32'!
+errorMessageEmptyPrefix
+	^'Prefix cannot be empty'! !
+
+!SentenceFinderByPrefix class methodsFor: 'as yet unclassified' stamp: 'MF 5/18/2020 21:44:59'!
+errorMessagePrefixWithSpaces
+	^'Prefix cannot have spaces'! !
