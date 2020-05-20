@@ -144,7 +144,7 @@ TestCase subclass: #SentenceFinderByPrefixTest
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MF 5/18/2020 22:02:33'!
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'DL 5/20/2020 17:51:36'!
 test01
 	| sentencesStack sentenceFinderByPrefix prefixToFind result |
 	
@@ -323,46 +323,84 @@ addBelow: aStackElement
 
 !classDefinition: #SentenceFinderByPrefix category: #'Stack-Exercise'!
 Object subclass: #SentenceFinderByPrefix
-	instanceVariableNames: 'sentencesStack auxiliaryStack'
+	instanceVariableNames: 'sentencesStack'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'MF 5/18/2020 22:21:05'!
-find: aPrefix
+!SentenceFinderByPrefix methodsFor: 'validation' stamp: 'DL 5/20/2020 17:59:02'!
+validatePrefix: aPrefix
 
-	| matchesList sentence |
+	self validatePrefixIsAString: aPrefix.
+	self validatePrefixIsNotEmpty: aPrefix.
+	self validatePrefixCannotHaveSpaces: aPrefix.! !
+
+!SentenceFinderByPrefix methodsFor: 'validation' stamp: 'DL 5/20/2020 18:05:24'!
+validatePrefixCannotHaveSpaces: aPrefix.
+
+	( 0 < (aPrefix  indexOf: Character space)) ifTrue: [self error: self class errorMessagePrefixWithSpaces].
+! !
+
+!SentenceFinderByPrefix methodsFor: 'validation' stamp: 'DL 5/20/2020 17:58:23'!
+validatePrefixIsAString: aPrefix
 	
 	( aPrefix isKindOf: String ) ifFalse: [self error: self class errorMessageCollaboratorIsNotAString].
-	( aPrefix isEmpty ) ifTrue: [self error: self class errorMessageEmptyPrefix].
-	( 0 < (aPrefix  indexOf: $ )) ifTrue: [self error: self class errorMessagePrefixWithSpaces].
+! !
 
-	matchesList := OrderedCollection new.
-	[ sentencesStack  isEmpty ] whileFalse: [
-		sentence := sentencesStack pop.
-		
-		(sentence beginsWith: aPrefix) ifTrue: [matchesList addLast: sentence].
-		
-		auxiliaryStack push: sentence.
-		].
+!SentenceFinderByPrefix methodsFor: 'validation' stamp: 'DL 5/20/2020 17:58:39'!
+validatePrefixIsNotEmpty: aPrefix.
+
+	( aPrefix isEmpty ) ifTrue: [self error: self class errorMessageEmptyPrefix].! !
+
+
+!SentenceFinderByPrefix methodsFor: 'initializing' stamp: 'DL 5/20/2020 18:18:37'!
+initializeWithStack: aStack
+
+	"self validateThatStackHasSentences: aStack."
+	sentencesStack  := aStack.
 	
-	[ auxiliaryStack  isEmpty ] whileFalse: [
-		sentence := auxiliaryStack pop.
-				
-		sentencesStack push: sentence.
+! !
+
+
+!SentenceFinderByPrefix methodsFor: 'private' stamp: 'DL 5/20/2020 18:35:44'!
+reverseStack: stackFrom to: stackTo andDo: block
+
+	| element |
+	
+	[ stackFrom isEmpty ] whileFalse: [ 
+		element := stackFrom pop.
+		block value: element.
+		stackTo push: element.
 		].
+! !
+
+
+!SentenceFinderByPrefix methodsFor: 'searching' stamp: 'DL 5/20/2020 18:17:55'!
+find: aPrefix
+
+	| matchesList |
+	
+	self validatePrefix: aPrefix.
+
+	matchesList := self findSentencesThatStartWith: aPrefix.
 	
 	^matchesList
 	
 ! !
 
-!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'MF 5/18/2020 21:10:03'!
-initializeWithStack: aStack
+!SentenceFinderByPrefix methodsFor: 'searching' stamp: 'DL 5/20/2020 18:39:36'!
+findSentencesThatStartWith: aPrefix
 
-	"self validateThatStackHasSentences: aStack."
-	sentencesStack  := aStack.
+	| matchesList auxiliaryStack |
+
+	matchesList := OrderedCollection new.
 	auxiliaryStack := OOStack new.
 	
+	self reverseStack: sentencesStack to: auxiliaryStack andDo: [:sentence | (sentence beginsWith: aPrefix) ifTrue: [matchesList addLast: sentence]].
+	
+	self reverseStack: auxiliaryStack to: sentencesStack andDo: [:sentence |].
+
+	^matchesList
 ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
