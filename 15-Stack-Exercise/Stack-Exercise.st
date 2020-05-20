@@ -352,11 +352,29 @@ validatePrefixIsNotEmpty: aPrefix.
 
 	( aPrefix isEmpty ) ifTrue: [self error: self class errorMessageEmptyPrefix].! !
 
+!SentenceFinderByPrefix methodsFor: 'validation' stamp: 'DL 5/20/2020 18:59:35'!
+validateThatStackHasSentences: aStack
 
-!SentenceFinderByPrefix methodsFor: 'initializing' stamp: 'DL 5/20/2020 18:18:37'!
+	| auxiliaryStack |
+
+	auxiliaryStack := OOStack new.
+	
+	self reverseStack: aStack to: auxiliaryStack andDo: 
+	[:element | (element isKindOf: String)
+		ifFalse: [self error: self class errorMessageStackWithElementNotString]].
+	
+	self reverseStack: auxiliaryStack to: aStack andDo: [:element |].
+	
+	
+	
+	
+! !
+
+
+!SentenceFinderByPrefix methodsFor: 'initializing' stamp: 'DL 5/20/2020 18:51:23'!
 initializeWithStack: aStack
 
-	"self validateThatStackHasSentences: aStack."
+	self validateThatStackHasSentences: aStack.
 	sentencesStack  := aStack.
 	
 ! !
@@ -409,14 +427,18 @@ findSentencesThatStartWith: aPrefix
 SentenceFinderByPrefix class
 	instanceVariableNames: ''!
 
-!SentenceFinderByPrefix class methodsFor: 'as yet unclassified' stamp: 'MF 5/18/2020 21:47:49'!
+!SentenceFinderByPrefix class methodsFor: 'messageErrors' stamp: 'MF 5/18/2020 21:47:49'!
 errorMessageCollaboratorIsNotAString
 	^'Collaborator must be a String instance'! !
 
-!SentenceFinderByPrefix class methodsFor: 'as yet unclassified' stamp: 'MF 5/18/2020 21:44:32'!
+!SentenceFinderByPrefix class methodsFor: 'messageErrors' stamp: 'MF 5/18/2020 21:44:32'!
 errorMessageEmptyPrefix
 	^'Prefix cannot be empty'! !
 
-!SentenceFinderByPrefix class methodsFor: 'as yet unclassified' stamp: 'MF 5/18/2020 21:44:59'!
+!SentenceFinderByPrefix class methodsFor: 'messageErrors' stamp: 'MF 5/18/2020 21:44:59'!
 errorMessagePrefixWithSpaces
 	^'Prefix cannot have spaces'! !
+
+!SentenceFinderByPrefix class methodsFor: 'messageErrors' stamp: 'DL 5/20/2020 18:57:22'!
+errorMessageStackWithElementNotString
+	^'Initializer stack must have only String elements'.! !
