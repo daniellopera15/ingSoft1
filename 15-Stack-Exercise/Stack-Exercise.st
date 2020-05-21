@@ -139,20 +139,56 @@ test10CanNotTopWhenThereAreNoObjectsInTheStack
 
 !classDefinition: #SentenceFinderByPrefixTest category: #'Stack-Exercise'!
 TestCase subclass: #SentenceFinderByPrefixTest
-	instanceVariableNames: ''
+	instanceVariableNames: 'upperCaseSentences mixedCaseSentences lowerCaseSentences'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MF 5/21/2020 15:08:57'!
+!SentenceFinderByPrefixTest methodsFor: 'setup' stamp: 'MF 5/21/2020 16:24:33'!
+createStackWithSentences: aSentencesCollection
+	
+	|stack|
+
+	stack := OOStack new.
+	aSentencesCollection do: [:sentence | stack push: sentence].
+	
+	^stack! !
+
+!SentenceFinderByPrefixTest methodsFor: 'setup' stamp: 'MF 5/21/2020 16:34:20'!
+setUp
+
+	upperCaseSentences  := #(
+		'Winter is coming'
+		'The winds of Winter'
+		'Winning is everything'
+		'Winter is here'
+	). 
+	mixedCaseSentences  := #(
+		'winter is coming'
+		'The winds of Winter'
+		'winning is everything'
+		'Winter is here'
+	).
+	lowerCaseSentences := #(
+		'winter is coming'
+		'the winds of Winter'
+		'winning is everything'
+		'winter is here'
+	).! !
+
+
+!SentenceFinderByPrefixTest methodsFor: 'assertions' stamp: 'MF 5/21/2020 16:41:09'!
+assertThat: aSentencesStack hasFromTopToBottom: aSentencesCollection
+	aSentencesCollection do: [:aSentence |
+			Assert that: aSentencesStack pop isEqualTo: aSentence.
+		].! !
+
+
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MF 5/21/2020 16:43:34'!
 test01FindPrefixPresentInASentenceShouldGetMatch
 	| sentencesStack sentenceFinderByPrefix prefixToFind result |
 	
-	sentencesStack := OOStack new.
-	sentencesStack push: 'winter is coming'.
-	sentencesStack push: 'The winds of Winter'.
-	sentencesStack push: 'winning is everything'.
-	sentencesStack push: 'Winter is here'.
+	sentencesStack := self createStackWithSentences: mixedCaseSentences.
 	sentenceFinderByPrefix := SentenceFinderByPrefix new initializeWithStack: sentencesStack.
 	prefixToFind := 'Wint'.
 		
@@ -161,25 +197,18 @@ test01FindPrefixPresentInASentenceShouldGetMatch
 	Assert that: result size isEqualTo: 1.
 	Assert that: (result at: 1) isEqualTo: 'Winter is here'.
 	
-	Assert that: sentencesStack pop isEqualTo: 'Winter is here'.
-	Assert that: sentencesStack pop isEqualTo: 'winning is everything'.
-	Assert that: sentencesStack pop isEqualTo: 'The winds of Winter'.
-	Assert that: sentencesStack pop isEqualTo: 'winter is coming'.
+	self assertThat: sentencesStack  hasFromTopToBottom: mixedCaseSentences reverse.
 
 		
 	
 ! !
 
-!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MF 5/21/2020 14:52:07'!
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MF 5/21/2020 16:35:01'!
 test02FindPrefixWithASpaceShouldFail
 
 	| sentencesStack sentenceFinderByPrefix prefixToFind |
 	
-	sentencesStack := OOStack new.
-	sentencesStack push: 'winter is coming'.
-	sentencesStack push: 'The winds of Winter'.
-	sentencesStack push: 'winning is everything'.
-	sentencesStack push: 'Winter is here'.
+	sentencesStack := self createStackWithSentences: mixedCaseSentences.
 	sentenceFinderByPrefix := SentenceFinderByPrefix new initializeWithStack: sentencesStack.
 	prefixToFind := 'wint is'.
 	
@@ -192,16 +221,12 @@ test02FindPrefixWithASpaceShouldFail
 
 	! !
 
-!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MF 5/21/2020 14:51:34'!
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MF 5/21/2020 16:35:16'!
 test03EmptyPrefixFindShouldFail
 
 	| sentencesStack sentenceFinderByPrefix prefixToFind |
 	
-	sentencesStack := OOStack new.
-	sentencesStack push: 'winter is coming'.
-	sentencesStack push: 'The winds of Winter'.
-	sentencesStack push: 'winning is everything'.
-	sentencesStack push: 'Winter is here'.
+	sentencesStack := self createStackWithSentences: mixedCaseSentences.
 	sentenceFinderByPrefix := SentenceFinderByPrefix new initializeWithStack: sentencesStack.
 	prefixToFind := ''.
 	
@@ -214,16 +239,12 @@ test03EmptyPrefixFindShouldFail
 
 	! !
 
-!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MF 5/21/2020 14:52:50'!
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MF 5/21/2020 16:35:29'!
 test04FindNonStringPrefixShouldFail
 
 	| sentencesStack sentenceFinderByPrefix prefixToFind |
 	
-	sentencesStack := OOStack new.
-	sentencesStack push: 'winter is coming'.
-	sentencesStack push: 'The winds of Winter'.
-	sentencesStack push: 'winning is everything'.
-	sentencesStack push: 'Winter is here'.
+	sentencesStack := self createStackWithSentences: mixedCaseSentences.
 	sentenceFinderByPrefix := SentenceFinderByPrefix new initializeWithStack: sentencesStack.
 	prefixToFind := 3.
 	
@@ -252,16 +273,12 @@ test05EmptyStackAndValidPrefixFindShouldReturnEmptyResult
 
 	! !
 
-!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MF 5/21/2020 14:56:07'!
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MF 5/21/2020 16:35:43'!
 test06FindWhenAllElementsStartWithUppercaseAndPrefixStartWithLowerCaseShouldNotGetMatches
 
 	| sentencesStack sentenceFinderByPrefix prefixToFind result |
 	
-	sentencesStack := OOStack new.
-	sentencesStack push: 'Winter is coming'.
-	sentencesStack push: 'The winds of Winter'.
-	sentencesStack push: 'Winning is everything'.
-	sentencesStack push: 'Winter is here'.
+	sentencesStack := self createStackWithSentences: upperCaseSentences.
 	sentenceFinderByPrefix := SentenceFinderByPrefix new initializeWithStack: sentencesStack.
 	prefixToFind := 'win'.
 	
@@ -271,16 +288,12 @@ test06FindWhenAllElementsStartWithUppercaseAndPrefixStartWithLowerCaseShouldNotG
 
 	! !
 
-!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MF 5/21/2020 14:57:29'!
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MF 5/21/2020 16:35:58'!
 test07FindWhenAllElementsStartWithLowerCaseAndPrefixStartWithUpperCaseShouldNotGetMatches
 
 	| sentencesStack sentenceFinderByPrefix prefixToFind result |
 	
-	sentencesStack := OOStack new.
-	sentencesStack push: 'winter is coming'.
-	sentencesStack push: 'the winds of Winter'.
-	sentencesStack push: 'winning is everything'.
-	sentencesStack push: 'winter is here'.
+	sentencesStack := self createStackWithSentences: lowerCaseSentences.
 	sentenceFinderByPrefix := SentenceFinderByPrefix new initializeWithStack: sentencesStack.
 	prefixToFind := 'Win'.
 	
@@ -290,16 +303,12 @@ test07FindWhenAllElementsStartWithLowerCaseAndPrefixStartWithUpperCaseShouldNotG
 
 	! !
 
-!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MF 5/21/2020 14:58:14'!
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MF 5/21/2020 16:36:13'!
 test08FindNonPresentPrefixPresentShouldNotGetMatches
 
 	| sentencesStack sentenceFinderByPrefix prefixToFind result |
 	
-	sentencesStack := OOStack new.
-	sentencesStack push: 'winter is coming'.
-	sentencesStack push: 'The winds of Winter'.
-	sentencesStack push: 'winning is everything'.
-	sentencesStack push: 'Winter is here'.
+	sentencesStack := self createStackWithSentences: mixedCaseSentences.
 	sentenceFinderByPrefix := SentenceFinderByPrefix new initializeWithStack: sentencesStack.
 	prefixToFind := 'WinterIsHere'.
 	
@@ -309,16 +318,17 @@ test08FindNonPresentPrefixPresentShouldNotGetMatches
 
 	! !
 
-!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MF 5/21/2020 14:45:37'!
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MF 5/21/2020 16:30:51'!
 test09InitializeSentenceFinderWithStackWithSomeNonStringElementsShouldFail
 
 	| sentencesStack |
 	
-	sentencesStack := OOStack new.
-	sentencesStack push: 1.
-	sentencesStack push: 'winter is'.
-	sentencesStack push: 3.
-	sentencesStack push: 'The Winter is coming'.
+	sentencesStack := self createStackWithSentences: #(
+		1
+		'winter is'
+		'3'
+		'The winter is coming'
+	).
 	
 	self 
 		should: [  SentenceFinderByPrefix new initializeWithStack: sentencesStack. ]
@@ -327,15 +337,11 @@ test09InitializeSentenceFinderWithStackWithSomeNonStringElementsShouldFail
 
 	! !
 
-!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MF 5/21/2020 15:13:37'!
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MF 5/21/2020 16:43:26'!
 test10FindPrefixPresentInMoreThanOneSentenceShouldGetAllMatches
 	| sentencesStack sentenceFinderByPrefix prefixToFind result |
 	
-	sentencesStack := OOStack new.
-	sentencesStack push: 'Winter is coming'.
-	sentencesStack push: 'The winds of Winter'.
-	sentencesStack push: 'Winning is everything'.
-	sentencesStack push: 'Winter is here'.
+	sentencesStack := self createStackWithSentences: upperCaseSentences.
 	sentenceFinderByPrefix := SentenceFinderByPrefix new initializeWithStack: sentencesStack.
 	prefixToFind := 'Win'.
 		
@@ -346,10 +352,8 @@ test10FindPrefixPresentInMoreThanOneSentenceShouldGetAllMatches
 	Assert that: (result at: 2) isEqualTo: 'Winning is everything'.
 	Assert that: (result at: 3) isEqualTo: 'Winter is coming'.
 	
-	Assert that: sentencesStack pop isEqualTo: 'Winter is here'.
-	Assert that: sentencesStack pop isEqualTo: 'Winning is everything'.
-	Assert that: sentencesStack pop isEqualTo: 'The winds of Winter'.
-	Assert that: sentencesStack pop isEqualTo: 'Winter is coming'.
+	self assertThat: sentencesStack  hasFromTopToBottom: upperCaseSentences reverse.
+.
 
 		
 	
