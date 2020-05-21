@@ -144,8 +144,8 @@ TestCase subclass: #SentenceFinderByPrefixTest
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'DL 5/20/2020 17:51:36'!
-test01
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MF 5/21/2020 15:08:57'!
+test01FindPrefixPresentInASentenceShouldGetMatch
 	| sentencesStack sentenceFinderByPrefix prefixToFind result |
 	
 	sentencesStack := OOStack new.
@@ -326,6 +326,34 @@ test09InitializeSentenceFinderWithStackWithSomeNonStringElementsShouldFail
 		withExceptionDo: [ :anError | self assert: anError messageText equals: SentenceFinderByPrefix errorMessageStackWithElementNotString ]
 
 	! !
+
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MF 5/21/2020 15:13:37'!
+test10FindPrefixPresentInMoreThanOneSentenceShouldGetAllMatches
+	| sentencesStack sentenceFinderByPrefix prefixToFind result |
+	
+	sentencesStack := OOStack new.
+	sentencesStack push: 'Winter is coming'.
+	sentencesStack push: 'The winds of Winter'.
+	sentencesStack push: 'Winning is everything'.
+	sentencesStack push: 'Winter is here'.
+	sentenceFinderByPrefix := SentenceFinderByPrefix new initializeWithStack: sentencesStack.
+	prefixToFind := 'Win'.
+		
+	result := sentenceFinderByPrefix find: prefixToFind.
+	
+	Assert that: result size isEqualTo: 3.
+	Assert that: (result at: 1) isEqualTo: 'Winter is here'.
+	Assert that: (result at: 2) isEqualTo: 'Winning is everything'.
+	Assert that: (result at: 3) isEqualTo: 'Winter is coming'.
+	
+	Assert that: sentencesStack pop isEqualTo: 'Winter is here'.
+	Assert that: sentencesStack pop isEqualTo: 'Winning is everything'.
+	Assert that: sentencesStack pop isEqualTo: 'The winds of Winter'.
+	Assert that: sentencesStack pop isEqualTo: 'Winter is coming'.
+
+		
+	
+! !
 
 
 !classDefinition: #OOStack category: #'Stack-Exercise'!
