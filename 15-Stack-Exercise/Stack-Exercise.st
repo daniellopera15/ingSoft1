@@ -170,6 +170,181 @@ test01
 	
 ! !
 
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'DL 5/21/2020 12:53:20'!
+test02AnyStackAndPrefixWithASpace
+
+	| sentencesStack sentenceFinderByPrefix prefixToFind |
+	
+	sentencesStack := OOStack new.
+	sentencesStack push: 'winter is coming'.
+	sentencesStack push: 'The winds of Winter'.
+	sentencesStack push: 'winning is everything'.
+	sentencesStack push: 'Winter is here'.
+	sentenceFinderByPrefix := SentenceFinderByPrefix new initializeWithStack: sentencesStack.
+	prefixToFind := 'wint is'.
+	
+	self 
+		should: [ sentenceFinderByPrefix find: prefixToFind. ]
+		raise: Error
+		withExceptionDo: [ :anError | self assert: anError messageText equals: SentenceFinderByPrefix errorMessagePrefixWithSpaces ]
+	
+	
+
+	! !
+
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'DL 5/21/2020 12:53:38'!
+test03AnyStackAndPrefixIsEmpty
+
+	| sentencesStack sentenceFinderByPrefix prefixToFind |
+	
+	sentencesStack := OOStack new.
+	sentencesStack push: 'winter is coming'.
+	sentencesStack push: 'The winds of Winter'.
+	sentencesStack push: 'winning is everything'.
+	sentencesStack push: 'Winter is here'.
+	sentenceFinderByPrefix := SentenceFinderByPrefix new initializeWithStack: sentencesStack.
+	prefixToFind := ''.
+	
+	self 
+		should: [ sentenceFinderByPrefix find: prefixToFind. ]
+		raise: Error
+		withExceptionDo: [ :anError | self assert: anError messageText equals: SentenceFinderByPrefix errorMessageEmptyPrefix ]
+	
+	
+
+	! !
+
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'DL 5/21/2020 12:53:54'!
+test04AnyStackAndPrefixIsNotAString
+
+	| sentencesStack sentenceFinderByPrefix prefixToFind |
+	
+	sentencesStack := OOStack new.
+	sentencesStack push: 'winter is coming'.
+	sentencesStack push: 'The winds of Winter'.
+	sentencesStack push: 'winning is everything'.
+	sentencesStack push: 'Winter is here'.
+	sentenceFinderByPrefix := SentenceFinderByPrefix new initializeWithStack: sentencesStack.
+	prefixToFind := 3.
+	
+	self 
+		should: [ sentenceFinderByPrefix find: prefixToFind. ]
+		raise: Error
+		withExceptionDo: [ :anError | self assert: anError messageText equals: SentenceFinderByPrefix errorMessageCollaboratorIsNotAString ]
+	
+	
+
+	! !
+
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'DL 5/21/2020 13:10:18'!
+test05EmptyStackAndValidPrefix
+
+	| sentencesStack sentenceFinderByPrefix prefixToFind result |
+	
+	sentencesStack := OOStack new.
+
+	sentenceFinderByPrefix := SentenceFinderByPrefix new initializeWithStack: sentencesStack.
+	prefixToFind := 'wint'.
+	
+	result := sentenceFinderByPrefix find: prefixToFind.
+	
+	Assert that: result size isEqualTo: 0.
+
+	! !
+
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'DL 5/21/2020 13:00:24'!
+test06AllElementsStartWithUppercaseAndPrefixStartWithLowercase
+
+	| sentencesStack sentenceFinderByPrefix prefixToFind result |
+	
+	sentencesStack := OOStack new.
+	sentencesStack push: 'Winter is coming'.
+	sentencesStack push: 'The winds of Winter'.
+	sentencesStack push: 'Winning is everything'.
+	sentencesStack push: 'Winter is here'.
+	sentenceFinderByPrefix := SentenceFinderByPrefix new initializeWithStack: sentencesStack.
+	prefixToFind := 'win'.
+	
+	result := sentenceFinderByPrefix find: prefixToFind.
+	
+	Assert that: result size isEqualTo: 0.
+
+	! !
+
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'DL 5/21/2020 13:01:23'!
+test07AllElementsStartWithLowercaseAndPrefixStartWithUppercase
+
+	| sentencesStack sentenceFinderByPrefix prefixToFind result |
+	
+	sentencesStack := OOStack new.
+	sentencesStack push: 'winter is coming'.
+	sentencesStack push: 'the winds of Winter'.
+	sentencesStack push: 'winning is everything'.
+	sentencesStack push: 'winter is here'.
+	sentenceFinderByPrefix := SentenceFinderByPrefix new initializeWithStack: sentencesStack.
+	prefixToFind := 'Win'.
+	
+	result := sentenceFinderByPrefix find: prefixToFind.
+	
+	Assert that: result size isEqualTo: 0.
+
+	! !
+
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'DL 5/21/2020 13:23:05'!
+test08ValidStackAndValidPrefixButDontMatched
+
+	| sentencesStack sentenceFinderByPrefix prefixToFind result |
+	
+	sentencesStack := OOStack new.
+	sentencesStack push: 'winter is coming'.
+	sentencesStack push: 'The winds of Winter'.
+	sentencesStack push: 'winning is everything'.
+	sentencesStack push: 'Winter is here'.
+	sentenceFinderByPrefix := SentenceFinderByPrefix new initializeWithStack: sentencesStack.
+	prefixToFind := 'WinterIsHere'.
+	
+	result := sentenceFinderByPrefix find: prefixToFind.
+	
+	Assert that: result size isEqualTo: 0.
+
+	! !
+
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'DL 5/21/2020 13:23:14'!
+test09AllElementsFromStackAreInteger
+
+	| sentencesStack |
+	
+	sentencesStack := OOStack new.
+	sentencesStack push: 1.
+	sentencesStack push: 2.
+	sentencesStack push: 3.
+	sentencesStack push: 4.
+	
+	self 
+		should: [  SentenceFinderByPrefix new initializeWithStack: sentencesStack. ]
+		raise: Error
+		withExceptionDo: [ :anError | self assert: anError messageText equals: SentenceFinderByPrefix errorMessageStackWithElementNotString ]
+
+	! !
+
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'DL 5/21/2020 13:23:20'!
+test10StackHasIntegersAndStringElements
+
+	| sentencesStack |
+	
+	sentencesStack := OOStack new.
+	sentencesStack push: 1.
+	sentencesStack push: 'winter is'.
+	sentencesStack push: 3.
+	sentencesStack push: 'The Winter is coming'.
+	
+	self 
+		should: [  SentenceFinderByPrefix new initializeWithStack: sentencesStack. ]
+		raise: Error
+		withExceptionDo: [ :anError | self assert: anError messageText equals: SentenceFinderByPrefix errorMessageStackWithElementNotString ]
+
+	! !
+
 
 !classDefinition: #OOStack category: #'Stack-Exercise'!
 Object subclass: #OOStack
