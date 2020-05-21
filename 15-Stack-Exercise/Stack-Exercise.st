@@ -170,8 +170,8 @@ test01
 	
 ! !
 
-!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'DL 5/21/2020 12:53:20'!
-test02AnyStackAndPrefixWithASpace
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MF 5/21/2020 14:52:07'!
+test02FindPrefixWithASpaceShouldFail
 
 	| sentencesStack sentenceFinderByPrefix prefixToFind |
 	
@@ -192,8 +192,8 @@ test02AnyStackAndPrefixWithASpace
 
 	! !
 
-!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'DL 5/21/2020 12:53:38'!
-test03AnyStackAndPrefixIsEmpty
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MF 5/21/2020 14:51:34'!
+test03EmptyPrefixFindShouldFail
 
 	| sentencesStack sentenceFinderByPrefix prefixToFind |
 	
@@ -214,8 +214,8 @@ test03AnyStackAndPrefixIsEmpty
 
 	! !
 
-!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'DL 5/21/2020 12:53:54'!
-test04AnyStackAndPrefixIsNotAString
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MF 5/21/2020 14:52:50'!
+test04FindNonStringPrefixShouldFail
 
 	| sentencesStack sentenceFinderByPrefix prefixToFind |
 	
@@ -236,8 +236,8 @@ test04AnyStackAndPrefixIsNotAString
 
 	! !
 
-!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'DL 5/21/2020 13:10:18'!
-test05EmptyStackAndValidPrefix
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MF 5/21/2020 14:53:47'!
+test05EmptyStackAndValidPrefixFindShouldReturnEmptyResult
 
 	| sentencesStack sentenceFinderByPrefix prefixToFind result |
 	
@@ -252,8 +252,8 @@ test05EmptyStackAndValidPrefix
 
 	! !
 
-!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'DL 5/21/2020 13:00:24'!
-test06AllElementsStartWithUppercaseAndPrefixStartWithLowercase
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MF 5/21/2020 14:56:07'!
+test06FindWhenAllElementsStartWithUppercaseAndPrefixStartWithLowerCaseShouldNotGetMatches
 
 	| sentencesStack sentenceFinderByPrefix prefixToFind result |
 	
@@ -271,8 +271,8 @@ test06AllElementsStartWithUppercaseAndPrefixStartWithLowercase
 
 	! !
 
-!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'DL 5/21/2020 13:01:23'!
-test07AllElementsStartWithLowercaseAndPrefixStartWithUppercase
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MF 5/21/2020 14:57:29'!
+test07FindWhenAllElementsStartWithLowerCaseAndPrefixStartWithUpperCaseShouldNotGetMatches
 
 	| sentencesStack sentenceFinderByPrefix prefixToFind result |
 	
@@ -290,8 +290,8 @@ test07AllElementsStartWithLowercaseAndPrefixStartWithUppercase
 
 	! !
 
-!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'DL 5/21/2020 13:23:05'!
-test08ValidStackAndValidPrefixButDontMatched
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MF 5/21/2020 14:58:14'!
+test08FindNonPresentPrefixPresentShouldNotGetMatches
 
 	| sentencesStack sentenceFinderByPrefix prefixToFind result |
 	
@@ -309,26 +309,8 @@ test08ValidStackAndValidPrefixButDontMatched
 
 	! !
 
-!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'DL 5/21/2020 13:23:14'!
-test09AllElementsFromStackAreInteger
-
-	| sentencesStack |
-	
-	sentencesStack := OOStack new.
-	sentencesStack push: 1.
-	sentencesStack push: 2.
-	sentencesStack push: 3.
-	sentencesStack push: 4.
-	
-	self 
-		should: [  SentenceFinderByPrefix new initializeWithStack: sentencesStack. ]
-		raise: Error
-		withExceptionDo: [ :anError | self assert: anError messageText equals: SentenceFinderByPrefix errorMessageStackWithElementNotString ]
-
-	! !
-
-!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'DL 5/21/2020 13:23:20'!
-test10StackHasIntegersAndStringElements
+!SentenceFinderByPrefixTest methodsFor: 'testing' stamp: 'MF 5/21/2020 14:45:37'!
+test09InitializeSentenceFinderWithStackWithSomeNonStringElementsShouldFail
 
 	| sentencesStack |
 	
