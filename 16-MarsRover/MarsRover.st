@@ -136,9 +136,9 @@ excecute: aCommandList
 	]
 ! !
 
-!MarsRover methodsFor: 'execution' stamp: 'MF 6/6/2020 20:01:52'!
+!MarsRover methodsFor: 'execution' stamp: 'MF 6/8/2020 15:39:39'!
 executeSingleCommand: aCommandChar
-	MarsRoverCommand execute: aCommandChar for: self.
+	(MarsRoverCommand commandFor: aCommandChar) executeFor: self.
 
 ! !
 
@@ -182,6 +182,10 @@ Object subclass: #MarsRoverCommand
 	poolDictionaries: ''
 	category: 'MarsRover'!
 
+!MarsRoverCommand methodsFor: 'as yet unclassified' stamp: 'MF 6/8/2020 15:35:09'!
+executeFor: aMarsRover
+	^self subclassResponsibility.! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'MarsRoverCommand class' category: #MarsRover!
@@ -193,13 +197,9 @@ canHandle: aCommandChar
 	^self subclassResponsibility.! !
 
 
-!MarsRoverCommand class methodsFor: 'execute' stamp: 'MF 6/6/2020 20:01:13'!
-execute: aCommandChar for: aMarsRover
-	(self subclasses detect: [:subclass | subclass canHandle: aCommandChar]) executeFor: aMarsRover.! !
-
-!MarsRoverCommand class methodsFor: 'execute' stamp: 'MF 6/6/2020 19:54:01'!
-executeFor: aMarsRover
-	^self subclassResponsibility.! !
+!MarsRoverCommand class methodsFor: 'execute' stamp: 'MF 6/8/2020 15:38:46'!
+commandFor: aCommandChar
+	^(self subclasses detect: [:subclass | subclass canHandle: aCommandChar]) new.! !
 
 
 !classDefinition: #BackwardCommand category: #MarsRover!
@@ -209,15 +209,15 @@ MarsRoverCommand subclass: #BackwardCommand
 	poolDictionaries: ''
 	category: 'MarsRover'!
 
+!BackwardCommand methodsFor: 'as yet unclassified' stamp: 'MF 6/8/2020 15:35:24'!
+executeFor: aMarsRover
+	^aMarsRover backward.! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'BackwardCommand class' category: #MarsRover!
 BackwardCommand class
 	instanceVariableNames: ''!
-
-!BackwardCommand class methodsFor: 'execute' stamp: 'MF 6/6/2020 19:54:33'!
-executeFor: aMarsRover
-	^aMarsRover backward.! !
 
 
 !BackwardCommand class methodsFor: 'canHandle' stamp: 'MF 6/6/2020 19:52:41'!
@@ -232,6 +232,10 @@ MarsRoverCommand subclass: #ForwardCommand
 	poolDictionaries: ''
 	category: 'MarsRover'!
 
+!ForwardCommand methodsFor: 'as yet unclassified' stamp: 'MF 6/8/2020 15:35:35'!
+executeFor: aMarsRover
+	^aMarsRover forward.! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'ForwardCommand class' category: #MarsRover!
@@ -243,10 +247,6 @@ canHandle: aCommandChar
 	^aCommandChar = $f.! !
 
 
-!ForwardCommand class methodsFor: 'execute' stamp: 'MF 6/6/2020 19:54:49'!
-executeFor: aMarsRover
-	^aMarsRover forward.! !
-
 
 !classDefinition: #Rotate90LeftCommand category: #MarsRover!
 MarsRoverCommand subclass: #Rotate90LeftCommand
@@ -254,6 +254,10 @@ MarsRoverCommand subclass: #Rotate90LeftCommand
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'MarsRover'!
+
+!Rotate90LeftCommand methodsFor: 'as yet unclassified' stamp: 'MF 6/8/2020 15:35:56'!
+executeFor: aMarsRover
+	^aMarsRover rotate90DegLeft.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -266,10 +270,6 @@ canHandle: aCommandChar
 	^aCommandChar = $l.! !
 
 
-!Rotate90LeftCommand class methodsFor: 'execute' stamp: 'MF 6/6/2020 19:56:39'!
-executeFor: aMarsRover
-	^aMarsRover rotate90DegLeft.! !
-
 
 !classDefinition: #Rotate90RightCommand category: #MarsRover!
 MarsRoverCommand subclass: #Rotate90RightCommand
@@ -277,6 +277,10 @@ MarsRoverCommand subclass: #Rotate90RightCommand
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'MarsRover'!
+
+!Rotate90RightCommand methodsFor: 'as yet unclassified' stamp: 'MF 6/8/2020 15:36:09'!
+executeFor: aMarsRover
+	^aMarsRover rotate90DegRight.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -288,10 +292,6 @@ Rotate90RightCommand class
 canHandle: aCommandChar
 	^aCommandChar = $r.! !
 
-
-!Rotate90RightCommand class methodsFor: 'execute' stamp: 'MF 6/6/2020 19:56:53'!
-executeFor: aMarsRover
-	^aMarsRover rotate90DegRight.! !
 
 
 !classDefinition: #MarsRoverTest category: #MarsRover!
