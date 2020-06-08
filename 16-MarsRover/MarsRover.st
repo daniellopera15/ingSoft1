@@ -1,117 +1,3 @@
-!classDefinition: #CardinalPoint category: #MarsRover!
-Object subclass: #CardinalPoint
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'MarsRover'!
-
-!CardinalPoint methodsFor: 'comparing' stamp: 'MF 6/6/2020 17:28:49'!
-= aCardinalPoint
- 	^self class = aCardinalPoint class.! !
-
-
-!CardinalPoint methodsFor: 'vector' stamp: 'MF 6/6/2020 18:05:49'!
-backwardVector
-	^(self forwardVector) negated.! !
-
-!CardinalPoint methodsFor: 'vector' stamp: 'MF 6/6/2020 17:51:47'!
-forwardVector
-	^self subclassResponsibility.! !
-
-
-!CardinalPoint methodsFor: 'rotate' stamp: 'MF 6/6/2020 17:12:58'!
-rotate90DegLeft
-	^self subclassResponsibility.! !
-
-!CardinalPoint methodsFor: 'rotate' stamp: 'MF 6/6/2020 17:36:50'!
-rotate90DegRight
-	^self subclassResponsibility.! !
-
-
-!classDefinition: #East category: #MarsRover!
-CardinalPoint subclass: #East
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'MarsRover'!
-
-!East methodsFor: 'vector' stamp: 'MF 6/6/2020 17:52:54'!
-forwardVector
-	^1@0.! !
-
-
-!East methodsFor: 'rotate' stamp: 'MF 6/6/2020 17:17:56'!
-rotate90DegLeft
-	^North new.! !
-
-!East methodsFor: 'rotate' stamp: 'MF 6/6/2020 17:37:07'!
-rotate90DegRight
-	^South new.! !
-
-
-!classDefinition: #North category: #MarsRover!
-CardinalPoint subclass: #North
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'MarsRover'!
-
-!North methodsFor: 'rotate' stamp: 'MF 6/6/2020 17:14:47'!
-rotate90DegLeft
-	^West new! !
-
-!North methodsFor: 'rotate' stamp: 'MF 6/6/2020 17:38:05'!
-rotate90DegRight
-	^East new! !
-
-
-!North methodsFor: 'vector' stamp: 'MF 6/6/2020 17:53:08'!
-forwardVector
-	^0@1.! !
-
-
-!classDefinition: #South category: #MarsRover!
-CardinalPoint subclass: #South
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'MarsRover'!
-
-!South methodsFor: 'rotate' stamp: 'MF 6/6/2020 17:16:44'!
-rotate90DegLeft
-	^East new.! !
-
-!South methodsFor: 'rotate' stamp: 'MF 6/6/2020 17:37:42'!
-rotate90DegRight
-	^West new.! !
-
-
-!South methodsFor: 'vector' stamp: 'MF 6/6/2020 17:53:24'!
-forwardVector
-	^0@-1.! !
-
-
-!classDefinition: #West category: #MarsRover!
-CardinalPoint subclass: #West
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'MarsRover'!
-
-!West methodsFor: 'rotate' stamp: 'MF 6/6/2020 17:15:25'!
-rotate90DegLeft
-	^South new.! !
-
-!West methodsFor: 'rotate' stamp: 'MF 6/6/2020 17:37:56'!
-rotate90DegRight
-	^North new.! !
-
-
-!West methodsFor: 'vector' stamp: 'MF 6/6/2020 17:53:47'!
-forwardVector
-	^-1@0.! !
-
-
 !classDefinition: #MarsRover category: #MarsRover!
 Object subclass: #MarsRover
 	instanceVariableNames: 'position orientation validCommands'
@@ -292,6 +178,120 @@ Rotate90RightCommand class
 canHandle: aCommandChar
 	^aCommandChar = $r.! !
 
+
+
+!classDefinition: #MarsRoverDirection category: #MarsRover!
+Object subclass: #MarsRoverDirection
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'MarsRover'!
+
+!MarsRoverDirection methodsFor: 'comparing' stamp: 'MF 6/6/2020 17:28:49'!
+= aCardinalPoint
+ 	^self class = aCardinalPoint class.! !
+
+
+!MarsRoverDirection methodsFor: 'vector' stamp: 'MF 6/6/2020 18:05:49'!
+backwardVector
+	^(self forwardVector) negated.! !
+
+!MarsRoverDirection methodsFor: 'vector' stamp: 'MF 6/6/2020 17:51:47'!
+forwardVector
+	^self subclassResponsibility.! !
+
+
+!MarsRoverDirection methodsFor: 'rotate' stamp: 'MF 6/6/2020 17:12:58'!
+rotate90DegLeft
+	^self subclassResponsibility.! !
+
+!MarsRoverDirection methodsFor: 'rotate' stamp: 'MF 6/6/2020 17:36:50'!
+rotate90DegRight
+	^self subclassResponsibility.! !
+
+
+!classDefinition: #MarsRoverEastDirection category: #MarsRover!
+MarsRoverDirection subclass: #MarsRoverEastDirection
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'MarsRover'!
+
+!MarsRoverEastDirection methodsFor: 'vector' stamp: 'MF 6/6/2020 17:52:54'!
+forwardVector
+	^1@0.! !
+
+
+!MarsRoverEastDirection methodsFor: 'rotate' stamp: 'MF 6/8/2020 15:45:29'!
+rotate90DegLeft
+	^MarsRoverNorthDirection new.! !
+
+!MarsRoverEastDirection methodsFor: 'rotate' stamp: 'MF 6/8/2020 15:45:41'!
+rotate90DegRight
+	^MarsRoverSouthDirection new.! !
+
+
+!classDefinition: #MarsRoverNorthDirection category: #MarsRover!
+MarsRoverDirection subclass: #MarsRoverNorthDirection
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'MarsRover'!
+
+!MarsRoverNorthDirection methodsFor: 'rotate' stamp: 'MF 6/8/2020 15:45:54'!
+rotate90DegLeft
+	^MarsRoverWestDirection new! !
+
+!MarsRoverNorthDirection methodsFor: 'rotate' stamp: 'MF 6/8/2020 15:45:04'!
+rotate90DegRight
+	^MarsRoverEastDirection new! !
+
+
+!MarsRoverNorthDirection methodsFor: 'vector' stamp: 'MF 6/6/2020 17:53:08'!
+forwardVector
+	^0@1.! !
+
+
+!classDefinition: #MarsRoverSouthDirection category: #MarsRover!
+MarsRoverDirection subclass: #MarsRoverSouthDirection
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'MarsRover'!
+
+!MarsRoverSouthDirection methodsFor: 'rotate' stamp: 'MF 6/8/2020 15:45:04'!
+rotate90DegLeft
+	^MarsRoverEastDirection new.! !
+
+!MarsRoverSouthDirection methodsFor: 'rotate' stamp: 'MF 6/8/2020 15:45:54'!
+rotate90DegRight
+	^MarsRoverWestDirection new.! !
+
+
+!MarsRoverSouthDirection methodsFor: 'vector' stamp: 'MF 6/6/2020 17:53:24'!
+forwardVector
+	^0@-1.! !
+
+
+!classDefinition: #MarsRoverWestDirection category: #MarsRover!
+MarsRoverDirection subclass: #MarsRoverWestDirection
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'MarsRover'!
+
+!MarsRoverWestDirection methodsFor: 'rotate' stamp: 'MF 6/8/2020 15:45:41'!
+rotate90DegLeft
+	^MarsRoverSouthDirection new.! !
+
+!MarsRoverWestDirection methodsFor: 'rotate' stamp: 'MF 6/8/2020 15:45:29'!
+rotate90DegRight
+	^MarsRoverNorthDirection new.! !
+
+
+!MarsRoverWestDirection methodsFor: 'vector' stamp: 'MF 6/6/2020 17:53:47'!
+forwardVector
+	^-1@0.! !
 
 
 !classDefinition: #MarsRoverTest category: #MarsRover!
@@ -571,9 +571,9 @@ testExecutingMixedCommandsShouldWorkProperly
 	self assert: north equals: rover orientation.! !
 
 
-!MarsRoverTest methodsFor: 'setup' stamp: 'MF 6/6/2020 17:21:29'!
+!MarsRoverTest methodsFor: 'setup' stamp: 'MF 6/8/2020 15:45:54'!
 setUp
-	north := North new.
-	south := South new.
-	west := West new.
-	east := East new.! !
+	north := MarsRoverNorthDirection new.
+	south := MarsRoverSouthDirection new.
+	west := MarsRoverWestDirection new.
+	east := MarsRoverEastDirection new.! !
