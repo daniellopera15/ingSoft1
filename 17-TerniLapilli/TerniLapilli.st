@@ -76,19 +76,104 @@ testF
 	
 	self should: [game putOAt: 0@0] raise: Error description: TerniLapilli positionIsTakenErrorDescription.! !
 
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'DL 6/15/2020 16:29:09'!
+testG
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	game putXAt: 0@0.
+	game putOAt: 0@1.
+	
+	self should: [game putXAt: 0@1] raise: Error description: TerniLapilli positionIsTakenErrorDescription.! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'DL 6/15/2020 16:33:55'!
+testH
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	game putXAt: 0@0.
+	game putOAt: 0@1.
+	
+	self should: [game putXAt: 0@0] raise: Error description: TerniLapilli positionIsTakenErrorDescription.! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'DL 6/15/2020 16:35:40'!
+testI
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	game putXAt: 0@0.
+	game putOAt: 0@1.
+	game putXAt: 0@2.
+	
+	self should: [game putOAt: 0@1] raise: Error description: TerniLapilli positionIsTakenErrorDescription.! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'DL 6/15/2020 16:59:41'!
+testJ
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	self should: [game putXAt: -1@0] raise: Error description: TerniLapilli outOfBoardErrorDescription.! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'DL 6/15/2020 17:00:01'!
+testK
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	self should: [game putXAt: 0@-1] raise: Error description: TerniLapilli outOfBoardErrorDescription.! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'DL 6/15/2020 17:01:54'!
+testL
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	self should: [game putXAt: 3@2] raise: Error description: TerniLapilli outOfBoardErrorDescription.! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'DL 6/15/2020 17:02:38'!
+testM
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	self should: [game putXAt: 2@3] raise: Error description: TerniLapilli outOfBoardErrorDescription.! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'DL 6/15/2020 17:09:37'!
+testN
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	game putXAt: 1@1.
+	
+	self should: [game putOAt: -1@2] raise: Error description: TerniLapilli outOfBoardErrorDescription.! !
+
 
 !classDefinition: #TerniLapilli category: #TerniLapilli!
 Object subclass: #TerniLapilli
-	instanceVariableNames: 'turn positionsTakenByX'
+	instanceVariableNames: 'turn positionsTakenByX positionsTakenByO'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TerniLapilli'!
 
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/11/2020 21:27:57'!
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/15/2020 16:32:44'!
 initialize
 
 	turn := #X.
-	positionsTakenByX := OrderedCollection new.! !
+	positionsTakenByX := OrderedCollection new.
+	positionsTakenByO := OrderedCollection new.! !
 
 !TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/11/2020 20:15:08'!
 isPlayingO
@@ -100,24 +185,52 @@ isPlayingX
 
 	^turn = #X.! !
 
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/11/2020 21:27:57'!
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/15/2020 17:10:06'!
 putOAt: aPosition
 
-	turn = #O ifFalse: [self error: self class isNotTurnOfOErrorDescription].
+ 	self isPlayingO ifFalse: [self signalIsNotTurnOfO].
 	
-	(positionsTakenByX includes: aPosition) ifTrue: [self error: self class positionIsTakenErrorDescription].
+	self validatePositionIsInBounds: aPosition.	
+
+	self validPositionTaken: aPosition.
+	
+	positionsTakenByO add: aPosition.
 	
 	self turnOfX.! !
 
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/11/2020 21:27:57'!
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/15/2020 17:08:41'!
 putXAt: aPosition
 
-	turn = #X ifFalse: [self error: self class isNotTurnOfXErrorDescription].
+	self isPlayingX ifFalse: [self signalIsNotTurnOfX].
+	
+	self validatePositionIsInBounds: aPosition.	
+	
+	self validPositionTaken: aPosition.
 	
 	positionsTakenByX add: aPosition.
 	
 	self turnOfO.
 	! !
+
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/15/2020 16:45:24'!
+signalIsNotTurnOfO
+
+	^ self error: self class isNotTurnOfOErrorDescription! !
+
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/15/2020 16:46:03'!
+signalIsNotTurnOfX
+
+	^ self error: self class isNotTurnOfXErrorDescription! !
+
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/15/2020 17:04:09'!
+signalOutOfBoard
+
+	^ self error: self class outOfBoardErrorDescription! !
+
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/15/2020 16:41:16'!
+signalPositionIsTaken
+	
+	self error: self class positionIsTakenErrorDescription.	! !
 
 !TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/11/2020 20:08:22'!
 turnOfO
@@ -128,6 +241,19 @@ turnOfO
 turnOfX
 
 	turn := #X.! !
+
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/15/2020 16:41:40'!
+validPositionTaken: aPosition
+	
+	(positionsTakenByO includes: aPosition) ifTrue: [self signalPositionIsTaken].	
+	(positionsTakenByX includes: aPosition) ifTrue: [self signalPositionIsTaken].! !
+
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/15/2020 17:08:21'!
+validatePositionIsInBounds: aPosition
+	
+	(aPosition x between: 0 and: 2) ifFalse: [self signalOutOfBoard].
+	(aPosition y between: 0 and: 2) ifFalse: [self signalOutOfBoard].	
+	! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -144,6 +270,11 @@ isNotTurnOfOErrorDescription
 isNotTurnOfXErrorDescription
 
 	^'Is turn of O'.! !
+
+!TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'DL 6/15/2020 16:52:37'!
+outOfBoardErrorDescription
+
+	^'Cannot play in a position out of board.'! !
 
 !TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'DL 6/11/2020 20:51:15'!
 positionIsTakenErrorDescription
