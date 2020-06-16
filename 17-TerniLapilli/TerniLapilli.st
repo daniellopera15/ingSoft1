@@ -13,6 +13,129 @@ testA
 	
 	self assert: game isPlayingX.! !
 
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'DL 6/16/2020 18:37:49'!
+testAA
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	game putXAt: 1@1.
+	game putOAt: 2@2.
+	
+	game putXAt: 2@1.
+	game putOAt: 0@0.
+	
+	game putXAt: 0@1.
+	game putOAt: 1@2.
+	
+	game moveXFrom: 1@1 to: 1@0.
+	
+	self should: [game moveOFrom: 1@2 to: 0@1.] raise: Error withMessageText: TerniLapilli movingToTakenPositionErrorDescription.
+	
+	
+	
+	
+! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'DL 6/16/2020 18:37:54'!
+testAB
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	game putXAt: 1@1.
+	game putOAt: 2@2.
+	
+	game putXAt: 2@1.
+	game putOAt: 0@0.
+	
+	game putXAt: 0@1.
+	game putOAt: 1@2.
+	
+	game moveXFrom: 1@1 to: 1@0.
+	
+	self should: [game moveOFrom: 1@2 to: 0@1.] raise: Error withMessageText: TerniLapilli movingToTakenPositionErrorDescription.
+	
+	
+	
+	
+! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'DL 6/16/2020 18:38:32'!
+testAC
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	game putXAt: 1@1.
+	game putOAt: 2@2.
+	
+	game putXAt: 2@1.
+	game putOAt: 0@0.
+	
+	game putXAt: 0@1.
+	game putOAt: 1@2.
+	
+	game moveXFrom: 1@1 to: 1@0.
+	
+	self should: [game moveOFrom: 1@2 to: 1@3.] raise: Error withMessageText: TerniLapilli outOfBoardErrorDescription.
+	
+	
+	
+	
+! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'DL 6/16/2020 18:46:48'!
+testAD
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	game putXAt: 1@1.
+	game putOAt: 2@2.
+	
+	game putXAt: 2@1.
+	game putOAt: 0@0.
+	
+	game putXAt: 0@1.
+	game putOAt: 1@2.
+	
+	self should: [game moveXFrom: 1@1 to: 2@0.] raise: Error withMessageText: TerniLapilli movingTooFarErrorDescription.
+	
+	
+	
+	
+! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'DL 6/16/2020 19:02:51'!
+testAE
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	game putXAt: 1@1.
+	game putOAt: 2@2.
+	
+	game putXAt: 2@1.
+	game putOAt: 0@0.
+	
+	game putXAt: 0@1.
+	game putOAt: 1@2.
+	
+	game moveXFrom: 1@1 to: 1@0.
+	
+	self should: [game moveOFrom: 1@2 to: 2@0.] raise: Error withMessageText: TerniLapilli movingTooFarErrorDescription.
+	
+	
+	
+	
+! !
+
 !TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'DL 6/11/2020 19:58:07'!
 testAPARADESPUES
 
@@ -160,6 +283,239 @@ testN
 	
 	self should: [game putOAt: -1@2] raise: Error description: TerniLapilli outOfBoardErrorDescription.! !
 
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'DL 6/16/2020 17:11:09'!
+testO
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	game putXAt: 1@1.
+	
+	self should: [game putOAt: 1@-1] raise: Error description: TerniLapilli outOfBoardErrorDescription.! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'DL 6/16/2020 17:12:16'!
+testP
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	game putXAt: 1@1.
+	
+	self should: [game putOAt: 3@1] raise: Error description: TerniLapilli outOfBoardErrorDescription.! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'DL 6/16/2020 17:12:24'!
+testQ
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	game putXAt: 1@1.
+	
+	self should: [game putOAt: 2@3] raise: Error description: TerniLapilli outOfBoardErrorDescription.! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'DL 6/16/2020 17:19:12'!
+testR
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	game putXAt: 1@1.
+	game putOAt: 2@2.
+	
+	game putXAt: 2@1.
+	game putOAt: 0@0.
+	
+	game putXAt: 0@1.
+	game putOAt: 1@2.
+	
+	self should: [game putXAt: 0@2] raise: Error description: TerniLapilli notEnoughTokensErrorDescription.! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'DL 6/16/2020 17:32:52'!
+testS
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	game putXAt: 1@1.
+	game putOAt: 2@2.
+	
+	game putXAt: 2@1.
+	
+	self should: [game moveOFrom: 2@2 to: 1@2.] raise: Error withMessageText: TerniLapilli notInTokenMovementPhaseErrorDescription.
+	
+	
+	
+! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'DL 6/16/2020 17:41:11'!
+testT
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	game putXAt: 1@1.
+	game putOAt: 2@2.
+	
+	game putXAt: 2@1.
+	game putOAt: 0@0.
+	
+	game putXAt: 0@1.
+	game putOAt: 1@2.
+	
+	self should: [game moveXFrom: 2@2 to: 0@2.] raise: Error withMessageText: TerniLapilli movingTokenFailErrorDescription.
+	
+	
+	
+	
+! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'DL 6/16/2020 17:56:51'!
+testU
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	game putXAt: 1@1.
+	game putOAt: 2@2.
+	
+	game putXAt: 2@1.
+	game putOAt: 0@0.
+	
+	game putXAt: 1@2.
+	
+	self should: [game moveXFrom: 1@2 to: 1@0.] raise: Error withMessageText: TerniLapilli isNotTurnOfXErrorDescription.
+	
+	
+	
+	
+! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'DL 6/16/2020 18:54:25'!
+testV
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	game putXAt: 1@1.
+	game putOAt: 2@2.
+	
+	game putXAt: 2@1.
+	game putOAt: 0@0.
+	
+	game putXAt: 0@1.
+	game putOAt: 1@2.
+	
+	game moveXFrom: 1@1 to: 1@0.
+	
+	self should: [game moveXFrom: 2@1 to: 1@1.] raise: Error withMessageText: TerniLapilli isNotTurnOfXErrorDescription.
+	
+	
+	
+	
+! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'DL 6/16/2020 18:18:10'!
+testW
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	game putXAt: 1@1.
+	game putOAt: 2@2.
+	
+	game putXAt: 2@1.
+	game putOAt: 0@0.
+	
+	game putXAt: 0@1.
+	game putOAt: 1@2.
+	
+	self should: [game moveXFrom: 1@1 to: 1@2.] raise: Error withMessageText: TerniLapilli movingToTakenPositionErrorDescription.
+	
+	
+	
+	
+! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'DL 6/16/2020 18:18:26'!
+testX
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	game putXAt: 1@1.
+	game putOAt: 2@2.
+	
+	game putXAt: 2@1.
+	game putOAt: 0@0.
+	
+	game putXAt: 0@1.
+	game putOAt: 1@2.
+	
+	self should: [game moveXFrom: 1@1 to: 2@1.] raise: Error withMessageText: TerniLapilli movingToTakenPositionErrorDescription.
+	
+	
+	
+	
+! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'DL 6/16/2020 18:27:21'!
+testY
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	game putXAt: 1@1.
+	game putOAt: 2@2.
+	
+	game putXAt: 2@1.
+	game putOAt: 0@0.
+	
+	game putXAt: 0@1.
+	game putOAt: 1@2.
+	
+	self should: [game moveXFrom: 1@1 to: -1@1.] raise: Error withMessageText: TerniLapilli outOfBoardErrorDescription.
+	
+	
+	
+	
+! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'DL 6/16/2020 18:35:12'!
+testZ
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	game putXAt: 1@1.
+	game putOAt: 2@2.
+	
+	game putXAt: 2@1.
+	game putOAt: 0@0.
+	
+	game putXAt: 0@1.
+	game putOAt: 1@2.
+	
+	game moveXFrom: 1@1 to: 1@0.
+	
+	self should: [game moveOFrom: 1@1 to: 2@1.] raise: Error withMessageText: TerniLapilli movingTokenFailErrorDescription.
+	
+	
+	
+	
+! !
+
 
 !classDefinition: #TerniLapilli category: #TerniLapilli!
 Object subclass: #TerniLapilli
@@ -185,6 +541,37 @@ isPlayingX
 
 	^turn = #X.! !
 
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/16/2020 19:03:29'!
+moveOFrom: positionToken to: aPositionDestination
+
+	self isPlayingO ifFalse: [self error: self class isNotTurnOfOErrorDescription].
+
+	(positionsTakenByO size = 3) ifFalse: [self error: self class notInTokenMovementPhaseErrorDescription.].
+ 
+	(positionsTakenByO includes: positionToken)  ifFalse: [self error: self class movingTokenFailErrorDescription.].
+	
+	self validatePositionDestination: aPositionDestination.
+	
+	(aPositionDestination dist: positionToken) = 1 ifFalse: [self error: self class movingTooFarErrorDescription].
+	
+	self turnOfX. 
+	! !
+
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/16/2020 18:53:22'!
+moveXFrom: positionToken to: aPositionDestination
+
+	self isPlayingX ifFalse: [self error: self class isNotTurnOfXErrorDescription].
+ 
+	(positionsTakenByX size = 3) ifFalse: [self error: self class notInTokenMovementPhaseErrorDescription].
+	
+	(positionsTakenByX includes: positionToken) ifFalse: [self error: self class movingTokenFailErrorDescription].
+	
+	self validatePositionDestination: aPositionDestination.
+	
+	(aPositionDestination dist: positionToken) = 1 ifFalse: [self error: self class movingTooFarErrorDescription].
+	
+	self turnOfO.! !
+
 !TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/15/2020 17:10:06'!
 putOAt: aPosition
 
@@ -198,10 +585,12 @@ putOAt: aPosition
 	
 	self turnOfX.! !
 
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/15/2020 17:08:41'!
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/16/2020 17:23:07'!
 putXAt: aPosition
 
 	self isPlayingX ifFalse: [self signalIsNotTurnOfX].
+	
+	(positionsTakenByX size >= 3) ifTrue: [self error: self class notEnoughTokensErrorDescription].
 	
 	self validatePositionIsInBounds: aPosition.	
 	
@@ -248,6 +637,15 @@ validPositionTaken: aPosition
 	(positionsTakenByO includes: aPosition) ifTrue: [self signalPositionIsTaken].	
 	(positionsTakenByX includes: aPosition) ifTrue: [self signalPositionIsTaken].! !
 
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/16/2020 18:31:14'!
+validatePositionDestination: aPositionDestination
+	
+	self validatePositionIsInBounds: aPositionDestination.
+	
+	(positionsTakenByX includes: aPositionDestination) ifTrue: [self error: self class movingToTakenPositionErrorDescription].
+	
+	(positionsTakenByO includes: aPositionDestination) ifTrue: [self error: self class movingToTakenPositionErrorDescription].! !
+
 !TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/15/2020 17:08:21'!
 validatePositionIsInBounds: aPosition
 	
@@ -270,6 +668,31 @@ isNotTurnOfOErrorDescription
 isNotTurnOfXErrorDescription
 
 	^'Is turn of O'.! !
+
+!TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'DL 6/16/2020 18:12:43'!
+movingToTakenPositionErrorDescription
+
+	^'Cant move to taken position.'! !
+
+!TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'DL 6/16/2020 17:43:04'!
+movingTokenFailErrorDescription
+
+	^'Your token is not in that position.'! !
+
+!TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'DL 6/16/2020 18:47:57'!
+movingTooFarErrorDescription
+
+ 	^'Only movements to distance 1.'! !
+
+!TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'DL 6/16/2020 17:21:02'!
+notEnoughTokensErrorDescription
+	
+	^'You have alredy used all tokens'.! !
+
+!TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'DL 6/16/2020 17:30:51'!
+notInTokenMovementPhaseErrorDescription
+
+ 	^'Not in phase of movement.'! !
 
 !TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'DL 6/15/2020 16:52:37'!
 outOfBoardErrorDescription
