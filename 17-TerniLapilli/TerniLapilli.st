@@ -136,6 +136,156 @@ testAE
 	
 ! !
 
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'MF 6/17/2020 16:27:52'!
+testAF
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	self deny: (game isXAt: 1@2).! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'MF 6/17/2020 16:28:38'!
+testAG
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	game putXAt: 1@2.
+	
+	self assert: (game isXAt: 1@2).! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'MF 6/17/2020 16:30:56'!
+testAH
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	game putXAt: 1@2.
+	game putOAt: 2@2.
+	game putXAt: 0@0.
+	
+	self assert: ((game isXAt: 1@2) and: [game isXAt: 0@0]).! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'MF 6/17/2020 16:31:46'!
+testAI
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	game putXAt: 1@2.
+	
+	self deny: (game isOAt: 2@2).! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'MF 6/17/2020 16:35:46'!
+testAJ
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	game putXAt: 1@2.
+	game putOAt: 2@2.
+	game putXAt: 0@0.
+	game putOAt: 2@1.
+	
+	self assert: (game isOAt: 2@2).! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'MF 6/17/2020 16:47:23'!
+testAK
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	game putXAt: 1@2.
+	game putOAt: 2@0.
+	game putXAt: 0@0.
+	game putOAt: 2@1.
+	
+	self assert: ((game isOAt: 2@0) and: [game isOAt: 2@1]).! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'MF 6/17/2020 16:39:46'!
+testAL
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	game putXAt: 0@2.
+	game putOAt: 0@0.
+	game putXAt: 1@2.
+	game putOAt: 1@0.
+	game putXAt: 2@1.
+	game putOAt: 2@2.
+	
+	game moveXFrom: 1@2 to: 1@1 .
+	
+	self assert: ((game isXAt: 1@2) not and: [game isXAt: 1@1]).! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'MF 6/17/2020 16:51:10'!
+testAM
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	game putXAt: 0@2.
+	game putOAt: 0@0.
+	game putXAt: 1@2.
+	game putOAt: 1@0.
+	game putXAt: 2@1.
+	game putOAt: 2@2.
+	
+	game moveXFrom: 1@2 to: 1@1 .
+	game moveOFrom: 1@0 to: 2@0.
+	game moveXFrom: 1@1 to: 1@2.
+	
+	self assert: ((game isXAt: 1@1) not and: [game isXAt: 1@2]).! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'MF 6/17/2020 16:47:41'!
+testAN
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	game putXAt: 0@2.
+	game putOAt: 0@0.
+	game putXAt: 1@2.
+	game putOAt: 1@0.
+	game putXAt: 2@1.
+	game putOAt: 2@2.
+	
+	game moveXFrom: 1@2 to: 1@1 .
+	game moveOFrom: 2@2 to: 1@2 .
+	
+	self assert: ((game isOAt: 2@2) not and: [game isOAt: 1@2]).! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'MF 6/17/2020 16:50:34'!
+testAO
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	game putXAt: 0@2.
+	game putOAt: 0@0.
+	game putXAt: 1@2.
+	game putOAt: 1@0.
+	game putXAt: 2@1.
+	game putOAt: 2@2.
+	
+	game moveXFrom: 1@2 to: 1@1.
+	game moveOFrom: 1@0 to: 2@0.
+	game moveXFrom: 1@1 to: 1@2.
+	game moveOFrom: 2@0 to: 1@0.
+	
+	self assert: ((game isOAt: 2@0) not and: [game isOAt: 1@0]).! !
+
 !TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'DL 6/11/2020 19:58:07'!
 testAPARADESPUES
 
@@ -524,24 +674,7 @@ Object subclass: #TerniLapilli
 	poolDictionaries: ''
 	category: 'TerniLapilli'!
 
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/15/2020 16:32:44'!
-initialize
-
-	turn := #X.
-	positionsTakenByX := OrderedCollection new.
-	positionsTakenByO := OrderedCollection new.! !
-
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/11/2020 20:15:08'!
-isPlayingO
-
-	^turn = #O.! !
-
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/11/2020 20:19:56'!
-isPlayingX
-
-	^turn = #X.! !
-
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/16/2020 19:03:29'!
+!TerniLapilli methodsFor: 'token management' stamp: 'MF 6/17/2020 16:44:45'!
 moveOFrom: positionToken to: aPositionDestination
 
 	self isPlayingO ifFalse: [self error: self class isNotTurnOfOErrorDescription].
@@ -554,10 +687,13 @@ moveOFrom: positionToken to: aPositionDestination
 	
 	(aPositionDestination dist: positionToken) = 1 ifFalse: [self error: self class movingTooFarErrorDescription].
 	
+	positionsTakenByO remove: positionToken.
+	positionsTakenByO add: aPositionDestination.
+	
 	self turnOfX. 
 	! !
 
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/16/2020 18:53:22'!
+!TerniLapilli methodsFor: 'token management' stamp: 'MF 6/17/2020 16:42:29'!
 moveXFrom: positionToken to: aPositionDestination
 
 	self isPlayingX ifFalse: [self error: self class isNotTurnOfXErrorDescription].
@@ -570,9 +706,12 @@ moveXFrom: positionToken to: aPositionDestination
 	
 	(aPositionDestination dist: positionToken) = 1 ifFalse: [self error: self class movingTooFarErrorDescription].
 	
+	positionsTakenByX  remove: positionToken.
+	positionsTakenByX add: aPositionDestination.
+	
 	self turnOfO.! !
 
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/15/2020 17:10:06'!
+!TerniLapilli methodsFor: 'token management' stamp: 'DL 6/15/2020 17:10:06'!
 putOAt: aPosition
 
  	self isPlayingO ifFalse: [self signalIsNotTurnOfO].
@@ -585,7 +724,7 @@ putOAt: aPosition
 	
 	self turnOfX.! !
 
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/16/2020 17:23:07'!
+!TerniLapilli methodsFor: 'token management' stamp: 'DL 6/16/2020 17:23:07'!
 putXAt: aPosition
 
 	self isPlayingX ifFalse: [self signalIsNotTurnOfX].
@@ -600,6 +739,32 @@ putXAt: aPosition
 	
 	self turnOfO.
 	! !
+
+
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/15/2020 16:32:44'!
+initialize
+
+	turn := #X.
+	positionsTakenByX := OrderedCollection new.
+	positionsTakenByO := OrderedCollection new.! !
+
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'MF 6/17/2020 16:47:09'!
+isOAt: aPosition 
+	^positionsTakenByO includes: aPosition.! !
+
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/11/2020 20:15:08'!
+isPlayingO
+
+	^turn = #O.! !
+
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/11/2020 20:19:56'!
+isPlayingX
+
+	^turn = #X.! !
+
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'MF 6/17/2020 16:29:26'!
+isXAt: aPosition 
+	^positionsTakenByX includes: aPosition.! !
 
 !TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/15/2020 16:45:24'!
 signalIsNotTurnOfO
