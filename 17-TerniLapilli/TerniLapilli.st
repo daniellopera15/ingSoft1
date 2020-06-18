@@ -767,6 +767,25 @@ Object subclass: #TerniLapilli
 	poolDictionaries: ''
 	category: 'TerniLapilli'!
 
+!TerniLapilli methodsFor: 'protected' stamp: 'MF 6/18/2020 17:04:58'!
+isALineIn: positionsTakenByToken
+
+	^(positionsTakenByToken size = 3) ifTrue: 
+	[^lines anySatisfy: 
+		[:line | line allSatisfy: [:position | positionsTakenByToken includes: position]]
+	] ifFalse: [^false]! !
+
+!TerniLapilli methodsFor: 'protected' stamp: 'MF 6/18/2020 17:04:58'!
+isOWinning
+
+	^self isALineIn: positionsTakenByO! !
+
+!TerniLapilli methodsFor: 'protected' stamp: 'MF 6/18/2020 17:04:58'!
+isXWinning
+
+	^self isALineIn: positionsTakenByX.! !
+
+
 !TerniLapilli methodsFor: 'assertions' stamp: 'MF 6/18/2020 16:07:54'!
 hasPlayerOWon
 
@@ -799,79 +818,6 @@ isPlayingX
 !TerniLapilli methodsFor: 'assertions' stamp: 'MF 6/17/2020 16:29:26'!
 isXAt: aPosition 
 	^positionsTakenByX includes: aPosition.! !
-
-
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:19:30'!
-XXXXXXXverifyOIsWinner
-
-	^self XXXXXverify: positionsTakenByO! !
-
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:19:36'!
-XXXXXXXverifyXIsWinner
-
-	^self XXXXXverify: positionsTakenByX.! !
-
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:19:19'!
-XXXXXverify: positionsTakenByToken
-
-	^(positionsTakenByToken size = 3) ifTrue: 
-	[^lines anySatisfy: 
-		[:line | line allSatisfy: [:position | positionsTakenByToken includes: position]]
-	] ifFalse: [^false]! !
-
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:02:13'!
-initialize
-
-	turn := #X.
-	positionsTakenByX := OrderedCollection new.
-	positionsTakenByO := OrderedCollection new.
-	state := TerniLapilliXPlaysState new.
-	lines :={
-		{0@0. 1@0. 2@0}.
-		{0@1. 1@1. 2@1}.
-		{0@2. 1@2. 2@2}.
-		{0@0. 0@1. 0@2}.
-		{1@0. 1@1. 1@2}.
-		{2@0. 2@1. 2@2}.
-		{0@2. 1@1. 2@0}.
-		{0@0. 1@1. 2@2}
-	}! !
-
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:06:28'!
-numberOfOTokensInBoard
-	^positionsTakenByO size.! !
-
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:06:33'!
-numberOfXTokensInBoard
-	^positionsTakenByX size.! !
-
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/11/2020 20:08:22'!
-turnOfO
-
-	turn := #O.! !
-
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/11/2020 20:17:35'!
-turnOfX
-
-	turn := #X.! !
-
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/17/2020 19:28:18'!
-verify: positionsTakenByToken makeWinnerTo: typeToken
-
-	^ (positionsTakenByToken size = 3) ifTrue: 
-	[(lines anySatisfy: 
-		[:line | line allSatisfy: [:position | positionsTakenByToken includes: position]]) 
-		ifTrue: [winner := typeToken]]! !
-
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/17/2020 19:28:42'!
-verifyOIsWinner
-
-	self verify: positionsTakenByO makeWinnerTo: #O.! !
-
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/17/2020 19:29:10'!
-verifyXIsWinner
-
-	self verify: positionsTakenByX makeWinnerTo: #X.! !
 
 
 !TerniLapilli methodsFor: 'signals' stamp: 'DL 6/15/2020 16:45:24'!
@@ -943,6 +889,25 @@ validatePositionIsInBounds: aPosition
 	! !
 
 
+!TerniLapilli methodsFor: 'initializing' stamp: 'MF 6/18/2020 16:02:13'!
+initialize
+
+	turn := #X.
+	positionsTakenByX := OrderedCollection new.
+	positionsTakenByO := OrderedCollection new.
+	state := TerniLapilliXPlaysState new.
+	lines :={
+		{0@0. 1@0. 2@0}.
+		{0@1. 1@1. 2@1}.
+		{0@2. 1@2. 2@2}.
+		{0@0. 0@1. 0@2}.
+		{1@0. 1@1. 1@2}.
+		{2@0. 2@1. 2@2}.
+		{0@2. 1@1. 2@0}.
+		{0@0. 1@1. 2@2}
+	}! !
+
+
 !TerniLapilli methodsFor: 'token management' stamp: 'MF 6/18/2020 16:52:48'!
 addOTokenAt: aPosition
 	self validatePositionIsInBounds: aPosition.	
@@ -968,6 +933,14 @@ moveOFrom: positionToken to: aPositionDestination
 moveXFrom: positionToken to: aPositionDestination
 	state moveXFrom: positionToken to: aPositionDestination in: self.
 	state := state nextStateFor: self ! !
+
+!TerniLapilli methodsFor: 'token management' stamp: 'MF 6/18/2020 16:06:28'!
+numberOfOTokensInBoard
+	^positionsTakenByO size.! !
+
+!TerniLapilli methodsFor: 'token management' stamp: 'MF 6/18/2020 16:06:33'!
+numberOfXTokensInBoard
+	^positionsTakenByX size.! !
 
 !TerniLapilli methodsFor: 'token management' stamp: 'MF 6/18/2020 16:59:52'!
 putOAt: aPosition
@@ -1001,11 +974,6 @@ removeXFrom: positionToken andAddTo: aPositionDestination
 	positionsTakenByX remove: positionToken ifAbsent: [self error: self class movingTokenFailErrorDescription.].
 	
 	positionsTakenByX add: aPositionDestination.! !
-
-!TerniLapilli methodsFor: 'token management' stamp: 'MF 6/18/2020 16:28:13'!
-validateSomeoneWon
-
-	^ (winner = #X or: [winner = #O]) ifTrue: [self signalPlayingOnGameOver]! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1245,9 +1213,9 @@ moveOFrom: positionToken to: aPositionDestination in: aTerniLapilliGame
 	aTerniLapilliGame removeOFrom: positionToken andAddTo: aPositionDestination 
 ! !
 
-!TerniLapilliOMovesState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:15:43'!
+!TerniLapilliOMovesState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 17:03:44'!
 nextStateFor: aTerniLapilliGame
-	aTerniLapilliGame XXXXXXXverifyOIsWinner ifTrue: [^TerniLapilliOWinsState new] ifFalse: [^TerniLapilliXMovesState new]! !
+	aTerniLapilliGame isOWinning ifTrue: [^TerniLapilliOWinsState new] ifFalse: [^TerniLapilliXMovesState new]! !
 
 !TerniLapilliOMovesState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:39:41'!
 putOAt: aPosition in: aTerniLapilliGame
@@ -1267,9 +1235,9 @@ moveOFrom: positionToken to: aPositionDestination in: aTerniLapilliGame
 	^aTerniLapilliGame signalMovingInPlayPhase
 	! !
 
-!TerniLapilliOPlaysState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:15:53'!
+!TerniLapilliOPlaysState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 17:03:44'!
 nextStateFor: aTerniLapilliGame
-	aTerniLapilliGame XXXXXXXverifyOIsWinner 
+	aTerniLapilliGame isOWinning 
 		ifTrue: [^TerniLapilliOWinsState new] 
 		ifFalse: [
 			(aTerniLapilliGame numberOfOTokensInBoard < 3) ifTrue: [^TerniLapilliXPlaysState new] ifFalse: [^TerniLapilliXMovesState new]
@@ -1337,9 +1305,9 @@ moveXFrom: positionToken to: aPositionDestination in: aTerniLapilliGame
 
 ! !
 
-!TerniLapilliXMovesState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:16:02'!
+!TerniLapilliXMovesState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 17:04:07'!
 nextStateFor: aTerniLapilliGame
-	aTerniLapilliGame XXXXXXXverifyXIsWinner ifTrue: [^TerniLapilliXWinsState new] ifFalse: [^TerniLapilliOMovesState new]! !
+	aTerniLapilliGame isXWinning ifTrue: [^TerniLapilliXWinsState new] ifFalse: [^TerniLapilliOMovesState new]! !
 
 !TerniLapilliXMovesState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:46:42'!
 putXAt: aPosition in: aTerniLapilliGame
@@ -1358,9 +1326,9 @@ moveXFrom: positionToken to: aPositionDestination in: aTerniLapilliGame
 	^aTerniLapilliGame signalMovingInPlayPhase
 	! !
 
-!TerniLapilliXPlaysState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:16:10'!
+!TerniLapilliXPlaysState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 17:04:07'!
 nextStateFor: aTerniLapilliGame
-	aTerniLapilliGame XXXXXXXverifyXIsWinner ifTrue: [^TerniLapilliXWinsState new] ifFalse: [^TerniLapilliOPlaysState new]! !
+	aTerniLapilliGame isXWinning ifTrue: [^TerniLapilliXWinsState new] ifFalse: [^TerniLapilliOPlaysState new]! !
 
 !TerniLapilliXPlaysState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:54:12'!
 putXAt: aPosition in: aTerniLapilliGame
