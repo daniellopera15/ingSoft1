@@ -261,7 +261,7 @@ testFailMoveXWithPositionBelongsToO
 	
 ! !
 
-!TerniLapilliTest methodsFor: 'test X' stamp: 'DL 6/17/2020 21:19:05'!
+!TerniLapilliTest methodsFor: 'test X' stamp: 'MF 6/18/2020 14:00:49'!
 testFailWhenPutXMore3Times
 
 	| game |
@@ -274,7 +274,7 @@ testFailWhenPutXMore3Times
 	game putXAt: 2@1.
 	game putOAt: 0@0.
 	
-	game putXAt: 0@1.
+	game putXAt: 2@0.
 	game putOAt: 1@2.
 	
 	self should: [game putXAt: 0@2] raise: Error description: TerniLapilli notEnoughTokensErrorDescription.! !
@@ -690,6 +690,21 @@ testWhenMoveXAndWinCannotMoveO
 	
 	self should: [game moveOFrom: 1@1 to: 0@1. ] raise: Error withMessageText: TerniLapilli playingWhenThereIsAWinnerErrorDescription.! !
 
+!TerniLapilliTest methodsFor: 'test O' stamp: 'MF 6/18/2020 13:59:21'!
+testWhenPlayXAndWinCannotPlayO
+
+	| game |
+	
+	game := TerniLapilli new.
+	
+	game putXAt: 0@2.
+	game putOAt: 0@0.
+	game putXAt: 1@2.
+	game putOAt: 1@0.
+	game putXAt: 2@2.
+	
+	self should: [game putOAt: 1@1. ] raise: Error withMessageText: TerniLapilli playingWhenThereIsAWinnerErrorDescription.! !
+
 !TerniLapilliTest methodsFor: 'test O' stamp: 'DL 6/17/2020 21:50:09'!
 testWhenPutO2TimesThatPositionsBelongsToO
 
@@ -747,27 +762,70 @@ testWhenXAndOPutsAllTokensAndNoExistWinners
 
 !classDefinition: #TerniLapilli category: #TerniLapilli!
 Object subclass: #TerniLapilli
-	instanceVariableNames: 'turn positionsTakenByX positionsTakenByO winner lines'
+	instanceVariableNames: 'state turn positionsTakenByX positionsTakenByO winner lines'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TerniLapilli'!
 
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/17/2020 18:04:58'!
+!TerniLapilli methodsFor: 'assertions' stamp: 'MF 6/18/2020 16:07:54'!
 hasPlayerOWon
 
-	^winner = #O.! !
+	^state hasPlayerOWon.! !
 
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/17/2020 18:48:04'!
+!TerniLapilli methodsFor: 'assertions' stamp: 'MF 6/18/2020 16:08:09'!
 hasPlayerXWon
 	
-	^winner = #X.! !
+	^state hasPlayerXWon.! !
 
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/17/2020 18:40:31'!
+!TerniLapilli methodsFor: 'assertions' stamp: 'MF 6/17/2020 16:47:09'!
+isOAt: aPosition 
+	^positionsTakenByO includes: aPosition.! !
+
+!TerniLapilli methodsFor: 'assertions' stamp: 'MF 6/18/2020 14:59:03'!
+isOver
+
+	^self hasPlayerOWon or: [self hasPlayerXWon].! !
+
+!TerniLapilli methodsFor: 'assertions' stamp: 'MF 6/18/2020 15:58:01'!
+isPlayingO
+
+	^state isPlayingO .! !
+
+!TerniLapilli methodsFor: 'assertions' stamp: 'MF 6/18/2020 15:58:37'!
+isPlayingX
+
+	^state isPlayingX .! !
+
+!TerniLapilli methodsFor: 'assertions' stamp: 'MF 6/17/2020 16:29:26'!
+isXAt: aPosition 
+	^positionsTakenByX includes: aPosition.! !
+
+
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:19:30'!
+XXXXXXXverifyOIsWinner
+
+	^self XXXXXverify: positionsTakenByO! !
+
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:19:36'!
+XXXXXXXverifyXIsWinner
+
+	^self XXXXXverify: positionsTakenByX.! !
+
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:19:19'!
+XXXXXverify: positionsTakenByToken
+
+	^(positionsTakenByToken size = 3) ifTrue: 
+	[^lines anySatisfy: 
+		[:line | line allSatisfy: [:position | positionsTakenByToken includes: position]]
+	] ifFalse: [^false]! !
+
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:02:13'!
 initialize
 
 	turn := #X.
 	positionsTakenByX := OrderedCollection new.
 	positionsTakenByO := OrderedCollection new.
+	state := TerniLapilliXPlaysState new.
 	lines :={
 		{0@0. 1@0. 2@0}.
 		{0@1. 1@1. 2@1}.
@@ -779,43 +837,13 @@ initialize
 		{0@0. 1@1. 2@2}
 	}! !
 
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'MF 6/17/2020 16:47:09'!
-isOAt: aPosition 
-	^positionsTakenByO includes: aPosition.! !
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:06:28'!
+numberOfOTokensInBoard
+	^positionsTakenByO size.! !
 
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/11/2020 20:15:08'!
-isPlayingO
-
-	^turn = #O.! !
-
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/11/2020 20:19:56'!
-isPlayingX
-
-	^turn = #X.! !
-
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'MF 6/17/2020 16:29:26'!
-isXAt: aPosition 
-	^positionsTakenByX includes: aPosition.! !
-
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/15/2020 16:45:24'!
-signalIsNotTurnOfO
-
-	^ self error: self class isNotTurnOfOErrorDescription! !
-
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/15/2020 16:46:03'!
-signalIsNotTurnOfX
-
-	^ self error: self class isNotTurnOfXErrorDescription! !
-
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/15/2020 17:04:09'!
-signalOutOfBoard
-
-	^ self error: self class outOfBoardErrorDescription! !
-
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/15/2020 16:41:16'!
-signalPositionIsTaken
-	
-	self error: self class positionIsTakenErrorDescription.	! !
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:06:33'!
+numberOfXTokensInBoard
+	^positionsTakenByX size.! !
 
 !TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/11/2020 20:08:22'!
 turnOfO
@@ -826,28 +854,6 @@ turnOfO
 turnOfX
 
 	turn := #X.! !
-
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/15/2020 16:41:40'!
-validPositionTaken: aPosition
-	
-	(positionsTakenByO includes: aPosition) ifTrue: [self signalPositionIsTaken].	
-	(positionsTakenByX includes: aPosition) ifTrue: [self signalPositionIsTaken].! !
-
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/16/2020 18:31:14'!
-validatePositionDestination: aPositionDestination
-	
-	self validatePositionIsInBounds: aPositionDestination.
-	
-	(positionsTakenByX includes: aPositionDestination) ifTrue: [self error: self class movingToTakenPositionErrorDescription].
-	
-	(positionsTakenByO includes: aPositionDestination) ifTrue: [self error: self class movingToTakenPositionErrorDescription].! !
-
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/15/2020 17:08:21'!
-validatePositionIsInBounds: aPosition
-	
-	(aPosition x between: 0 and: 2) ifFalse: [self signalOutOfBoard].
-	(aPosition y between: 0 and: 2) ifFalse: [self signalOutOfBoard].	
-	! !
 
 !TerniLapilli methodsFor: 'as yet unclassified' stamp: 'DL 6/17/2020 19:28:18'!
 verify: positionsTakenByToken makeWinnerTo: typeToken
@@ -868,14 +874,114 @@ verifyXIsWinner
 	self verify: positionsTakenByX makeWinnerTo: #X.! !
 
 
-!TerniLapilli methodsFor: 'token management' stamp: 'DL 6/17/2020 20:28:32'!
+!TerniLapilli methodsFor: 'signals' stamp: 'DL 6/15/2020 16:45:24'!
+signalIsNotTurnOfO
+
+	^ self error: self class isNotTurnOfOErrorDescription! !
+
+!TerniLapilli methodsFor: 'signals' stamp: 'DL 6/15/2020 16:46:03'!
+signalIsNotTurnOfX
+
+	^ self error: self class isNotTurnOfXErrorDescription! !
+
+!TerniLapilli methodsFor: 'signals' stamp: 'MF 6/18/2020 16:37:32'!
+signalMovingInPlayPhase
+
+	^ self error: self class notInTokenMovementPhaseErrorDescription! !
+
+!TerniLapilli methodsFor: 'signals' stamp: 'DL 6/15/2020 17:04:09'!
+signalOutOfBoard
+
+	^ self error: self class outOfBoardErrorDescription! !
+
+!TerniLapilli methodsFor: 'signals' stamp: 'MF 6/18/2020 16:40:52'!
+signalPlayingInMovePhase
+
+	^ self error: self class notInTokenPlayingPhaseErrorDescription! !
+
+!TerniLapilli methodsFor: 'signals' stamp: 'MF 6/18/2020 16:32:18'!
+signalPlayingNotInOTurn
+
+	^ self error: self class isNotTurnOfOErrorDescription! !
+
+!TerniLapilli methodsFor: 'signals' stamp: 'MF 6/18/2020 16:31:26'!
+signalPlayingNotInXTurn
+
+	^ self error: self class isNotTurnOfXErrorDescription! !
+
+!TerniLapilli methodsFor: 'signals' stamp: 'MF 6/18/2020 16:28:13'!
+signalPlayingOnGameOver
+
+	^ self error: self class playingWhenThereIsAWinnerErrorDescription! !
+
+!TerniLapilli methodsFor: 'signals' stamp: 'DL 6/15/2020 16:41:16'!
+signalPositionIsTaken
+	
+	self error: self class positionIsTakenErrorDescription.	! !
+
+
+!TerniLapilli methodsFor: 'validations' stamp: 'DL 6/15/2020 16:41:40'!
+validPositionTaken: aPosition
+	
+	(positionsTakenByO includes: aPosition) ifTrue: [self signalPositionIsTaken].	
+	(positionsTakenByX includes: aPosition) ifTrue: [self signalPositionIsTaken].! !
+
+!TerniLapilli methodsFor: 'validations' stamp: 'DL 6/16/2020 18:31:14'!
+validatePositionDestination: aPositionDestination
+	
+	self validatePositionIsInBounds: aPositionDestination.
+	
+	(positionsTakenByX includes: aPositionDestination) ifTrue: [self error: self class movingToTakenPositionErrorDescription].
+	
+	(positionsTakenByO includes: aPositionDestination) ifTrue: [self error: self class movingToTakenPositionErrorDescription].! !
+
+!TerniLapilli methodsFor: 'validations' stamp: 'DL 6/15/2020 17:08:21'!
+validatePositionIsInBounds: aPosition
+	
+	(aPosition x between: 0 and: 2) ifFalse: [self signalOutOfBoard].
+	(aPosition y between: 0 and: 2) ifFalse: [self signalOutOfBoard].	
+	! !
+
+
+!TerniLapilli methodsFor: 'token management' stamp: 'MF 6/18/2020 16:52:48'!
+addOTokenAt: aPosition
+	self validatePositionIsInBounds: aPosition.	
+
+	self validPositionTaken: aPosition.
+	
+	positionsTakenByO add: aPosition.! !
+
+!TerniLapilli methodsFor: 'token management' stamp: 'MF 6/18/2020 16:53:00'!
+addXTokenAt: aPosition
+	self validatePositionIsInBounds: aPosition.	
+
+	self validPositionTaken: aPosition.
+	
+	positionsTakenByX add: aPosition.! !
+
+!TerniLapilli methodsFor: 'token management' stamp: 'MF 6/18/2020 16:59:36'!
 moveOFrom: positionToken to: aPositionDestination
+	state moveOFrom: positionToken to: aPositionDestination in: self.
+	state := state nextStateFor: self! !
 
-	self validateSomeoneWon.
+!TerniLapilli methodsFor: 'token management' stamp: 'MF 6/18/2020 16:59:43'!
+moveXFrom: positionToken to: aPositionDestination
+	state moveXFrom: positionToken to: aPositionDestination in: self.
+	state := state nextStateFor: self ! !
 
-	self isPlayingO ifFalse: [self error: self class isNotTurnOfOErrorDescription].
+!TerniLapilli methodsFor: 'token management' stamp: 'MF 6/18/2020 16:59:52'!
+putOAt: aPosition
+	state putOAt: aPosition in: self.
+	state := state nextStateFor: self! !
 
-	(positionsTakenByO size = 3) ifFalse: [self error: self class notInTokenMovementPhaseErrorDescription.].
+!TerniLapilli methodsFor: 'token management' stamp: 'MF 6/18/2020 16:59:58'!
+putXAt: aPosition
+
+	state putXAt: aPosition in: self.
+	state := state nextStateFor: self! !
+
+!TerniLapilli methodsFor: 'token management' stamp: 'MF 6/18/2020 16:59:22'!
+removeOFrom: positionToken andAddTo: aPositionDestination
 	
 	self validatePositionDestination: aPositionDestination.
 	
@@ -883,71 +989,23 @@ moveOFrom: positionToken to: aPositionDestination
 	
 	positionsTakenByO remove: positionToken ifAbsent: [self error: self class movingTokenFailErrorDescription.].
 	
-	positionsTakenByO add: aPositionDestination.
-	
-	self verifyOIsWinner.
-	
-	self turnOfX. 
-	! !
+	positionsTakenByO add: aPositionDestination.! !
 
-!TerniLapilli methodsFor: 'token management' stamp: 'DL 6/17/2020 20:28:52'!
-moveXFrom: positionToken to: aPositionDestination
-
-	self validateSomeoneWon.
-	
-	self isPlayingX ifFalse: [self error: self class isNotTurnOfXErrorDescription].
- 
-	(positionsTakenByX size = 3) ifFalse: [self error: self class notInTokenMovementPhaseErrorDescription].
+!TerniLapilli methodsFor: 'token management' stamp: 'MF 6/18/2020 16:59:28'!
+removeXFrom: positionToken andAddTo: aPositionDestination
 	
 	self validatePositionDestination: aPositionDestination.
 	
 	(aPositionDestination dist: positionToken) = 1 ifFalse: [self error: self class movingTooFarErrorDescription].
 	
-	positionsTakenByX remove: positionToken ifAbsent: [self error: self class movingTokenFailErrorDescription].
+	positionsTakenByX remove: positionToken ifAbsent: [self error: self class movingTokenFailErrorDescription.].
 	
-	positionsTakenByX add: aPositionDestination.
-	
-	self verifyXIsWinner. 
-	
-	self turnOfO.! !
+	positionsTakenByX add: aPositionDestination.! !
 
-!TerniLapilli methodsFor: 'token management' stamp: 'DL 6/17/2020 19:23:45'!
-putOAt: aPosition
-
- 	self isPlayingO ifFalse: [self signalIsNotTurnOfO].
-	
-	self validatePositionIsInBounds: aPosition.	
-
-	self validPositionTaken: aPosition.
-	
-	positionsTakenByO add: aPosition.
-	
-	self verifyOIsWinner.
-	
-	self turnOfX.! !
-
-!TerniLapilli methodsFor: 'token management' stamp: 'DL 6/17/2020 19:23:15'!
-putXAt: aPosition
-
-	self isPlayingX ifFalse: [self signalIsNotTurnOfX].
-	
-	(positionsTakenByX size >= 3) ifTrue: [self error: self class notEnoughTokensErrorDescription].
-	
-	self validatePositionIsInBounds: aPosition.	
-	
-	self validPositionTaken: aPosition.
-	
-	positionsTakenByX add: aPosition.
-	
-	self verifyXIsWinner.
-	
-	self turnOfO.
-	! !
-
-!TerniLapilli methodsFor: 'token management' stamp: 'DL 6/17/2020 20:28:32'!
+!TerniLapilli methodsFor: 'token management' stamp: 'MF 6/18/2020 16:28:13'!
 validateSomeoneWon
 
-	^ (winner = #X or: [winner = #O]) ifTrue: [self error: self class playingWhenThereIsAWinnerErrorDescription]! !
+	^ (winner = #X or: [winner = #O]) ifTrue: [self signalPlayingOnGameOver]! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -985,10 +1043,15 @@ notEnoughTokensErrorDescription
 	
 	^'You have alredy used all tokens'.! !
 
-!TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'DL 6/16/2020 17:30:51'!
+!TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:41:40'!
 notInTokenMovementPhaseErrorDescription
 
  	^'Not in phase of movement.'! !
+
+!TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:41:50'!
+notInTokenPlayingPhaseErrorDescription
+
+ 	^'Not in phase of playing new tokens.'! !
 
 !TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'DL 6/15/2020 16:52:37'!
 outOfBoardErrorDescription
@@ -1004,3 +1067,302 @@ playingWhenThereIsAWinnerErrorDescription
 positionIsTakenErrorDescription
 
 	^'The position is taken.'! !
+
+
+!classDefinition: #TerniLapilliState category: #TerniLapilli!
+Object subclass: #TerniLapilliState
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TerniLapilli'!
+
+!TerniLapilliState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:08:37'!
+hasPlayerOWon
+	^self subclassResponsibility ! !
+
+!TerniLapilliState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:08:40'!
+hasPlayerXWon
+	^self subclassResponsibility ! !
+
+!TerniLapilliState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 15:58:17'!
+isPlayingO
+	^self subclassResponsibility ! !
+
+!TerniLapilliState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 15:58:19'!
+isPlayingX
+	^self subclassResponsibility ! !
+
+!TerniLapilliState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:26:56'!
+moveOFrom: positionToken to: aPositionDestination in: aTerniLapilliGame
+	^self subclassResponsibility ! !
+
+!TerniLapilliState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:27:14'!
+moveXFrom: positionToken to: aPositionDestination in: aTerniLapilliGame
+	^self subclassResponsibility ! !
+
+!TerniLapilliState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 15:50:10'!
+nextStateFor: aTerniLapilliGame
+	^self subclassResponsibility ! !
+
+!TerniLapilliState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:28:54'!
+putOAt: aPosition in: aTerniLapilliGame
+	^self subclassResponsibility ! !
+
+!TerniLapilliState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:28:57'!
+putXAt: aPosition in: aTerniLapilliGame
+	^self subclassResponsibility ! !
+
+
+!classDefinition: #TerniLapilliGameOverState category: #TerniLapilli!
+TerniLapilliState subclass: #TerniLapilliGameOverState
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TerniLapilli'!
+
+!TerniLapilliGameOverState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:09:13'!
+hasPlayerOWon
+	^self subclassResponsibility ! !
+
+!TerniLapilliGameOverState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:09:19'!
+hasPlayerXWon
+	^self subclassResponsibility ! !
+
+!TerniLapilliGameOverState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 15:54:32'!
+isPlayingO
+	^false! !
+
+!TerniLapilliGameOverState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 15:54:38'!
+isPlayingX
+	^false! !
+
+!TerniLapilliGameOverState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:28:30'!
+moveOFrom: positionToken to: aPositionDestination in: aTerniLapilliGame
+	^aTerniLapilliGame signalPlayingOnGameOver ! !
+
+!TerniLapilliGameOverState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:28:34'!
+moveXFrom: positionToken to: aPositionDestination in: aTerniLapilliGame
+	^aTerniLapilliGame signalPlayingOnGameOver ! !
+
+!TerniLapilliGameOverState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 15:56:33'!
+nextStateFor: aTerniLapilliGame
+	^self! !
+
+!TerniLapilliGameOverState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:29:45'!
+putOAt: aPosition in: aTerniLapilliGame
+	^aTerniLapilliGame signalPlayingOnGameOver! !
+
+!TerniLapilliGameOverState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:29:40'!
+putXAt: aPosition in: aTerniLapilliGame
+	^aTerniLapilliGame signalPlayingOnGameOver! !
+
+
+!classDefinition: #TerniLapilliOWinsState category: #TerniLapilli!
+TerniLapilliGameOverState subclass: #TerniLapilliOWinsState
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TerniLapilli'!
+
+!TerniLapilliOWinsState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:09:31'!
+hasPlayerOWon
+	^true! !
+
+!TerniLapilliOWinsState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:09:38'!
+hasPlayerXWon
+	^false! !
+
+
+!classDefinition: #TerniLapilliXWinsState category: #TerniLapilli!
+TerniLapilliGameOverState subclass: #TerniLapilliXWinsState
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TerniLapilli'!
+
+!TerniLapilliXWinsState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:10:13'!
+hasPlayerOWon
+	^false! !
+
+!TerniLapilliXWinsState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:10:17'!
+hasPlayerXWon
+	^true! !
+
+
+!classDefinition: #TerniLapilliOTurnState category: #TerniLapilli!
+TerniLapilliState subclass: #TerniLapilliOTurnState
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TerniLapilli'!
+
+!TerniLapilliOTurnState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:10:39'!
+hasPlayerOWon
+	^false! !
+
+!TerniLapilliOTurnState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:10:48'!
+hasPlayerXWon
+	^false! !
+
+!TerniLapilliOTurnState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 15:52:53'!
+isPlayingO
+	^true! !
+
+!TerniLapilliOTurnState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 15:52:58'!
+isPlayingX
+	^false! !
+
+!TerniLapilliOTurnState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:33:39'!
+moveOFrom: positionToken to: aPositionDestination in: aTerniLapilliGame
+	^self subclassResponsibility! !
+
+!TerniLapilliOTurnState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:32:58'!
+moveXFrom: positionToken to: aPositionDestination in: aTerniLapilliGame
+	^aTerniLapilliGame signalPlayingNotInXTurn ! !
+
+!TerniLapilliOTurnState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 15:53:34'!
+nextStateFor: aTerniLapilliGame
+	^self subclassResponsibility ! !
+
+!TerniLapilliOTurnState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:30:23'!
+putOAt: aPosition in: aTerniLapilliGame
+	^self subclassResponsibility! !
+
+!TerniLapilliOTurnState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:32:33'!
+putXAt: aPosition in: aTerniLapilliGame
+	^aTerniLapilliGame signalPlayingNotInXTurn ! !
+
+
+!classDefinition: #TerniLapilliOMovesState category: #TerniLapilli!
+TerniLapilliOTurnState subclass: #TerniLapilliOMovesState
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TerniLapilli'!
+
+!TerniLapilliOMovesState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:56:05'!
+moveOFrom: positionToken to: aPositionDestination in: aTerniLapilliGame
+	aTerniLapilliGame removeOFrom: positionToken andAddTo: aPositionDestination 
+! !
+
+!TerniLapilliOMovesState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:15:43'!
+nextStateFor: aTerniLapilliGame
+	aTerniLapilliGame XXXXXXXverifyOIsWinner ifTrue: [^TerniLapilliOWinsState new] ifFalse: [^TerniLapilliXMovesState new]! !
+
+!TerniLapilliOMovesState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:39:41'!
+putOAt: aPosition in: aTerniLapilliGame
+	^aTerniLapilliGame signalPlayingInMovePhase
+! !
+
+
+!classDefinition: #TerniLapilliOPlaysState category: #TerniLapilli!
+TerniLapilliOTurnState subclass: #TerniLapilliOPlaysState
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TerniLapilli'!
+
+!TerniLapilliOPlaysState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:38:37'!
+moveOFrom: positionToken to: aPositionDestination in: aTerniLapilliGame
+	^aTerniLapilliGame signalMovingInPlayPhase
+	! !
+
+!TerniLapilliOPlaysState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:15:53'!
+nextStateFor: aTerniLapilliGame
+	aTerniLapilliGame XXXXXXXverifyOIsWinner 
+		ifTrue: [^TerniLapilliOWinsState new] 
+		ifFalse: [
+			(aTerniLapilliGame numberOfOTokensInBoard < 3) ifTrue: [^TerniLapilliXPlaysState new] ifFalse: [^TerniLapilliXMovesState new]
+			]! !
+
+!TerniLapilliOPlaysState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:53:53'!
+putOAt: aPosition in: aTerniLapilliGame
+	aTerniLapilliGame addOTokenAt: aPosition! !
+
+
+!classDefinition: #TerniLapilliXTurnState category: #TerniLapilli!
+TerniLapilliState subclass: #TerniLapilliXTurnState
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TerniLapilli'!
+
+!TerniLapilliXTurnState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:11:01'!
+hasPlayerOWon
+	^false! !
+
+!TerniLapilliXTurnState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:11:03'!
+hasPlayerXWon
+	^false! !
+
+!TerniLapilliXTurnState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:03:07'!
+isPlayingO
+	^false! !
+
+!TerniLapilliXTurnState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:03:25'!
+isPlayingX
+	^true! !
+
+!TerniLapilliXTurnState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:34:15'!
+moveOFrom: positionToken to: aPositionDestination in: aTerniLapilliGame
+	^aTerniLapilliGame signalPlayingNotInOTurn! !
+
+!TerniLapilliXTurnState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:33:56'!
+moveXFrom: positionToken to: aPositionDestination in: aTerniLapilliGame
+	^self subclassResponsibility ! !
+
+!TerniLapilliXTurnState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 15:56:03'!
+nextStateFor: aTerniLapilliGame
+	^self subclassResponsibility! !
+
+!TerniLapilliXTurnState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:34:40'!
+putOAt: aPosition in: aTerniLapilliGame
+	^aTerniLapilliGame signalPlayingNotInOTurn! !
+
+!TerniLapilliXTurnState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:34:51'!
+putXAt: aPosition in: aTerniLapilliGame
+	^self subclassResponsibility! !
+
+
+!classDefinition: #TerniLapilliXMovesState category: #TerniLapilli!
+TerniLapilliXTurnState subclass: #TerniLapilliXMovesState
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TerniLapilli'!
+
+!TerniLapilliXMovesState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:56:17'!
+moveXFrom: positionToken to: aPositionDestination in: aTerniLapilliGame
+	aTerniLapilliGame removeXFrom: positionToken andAddTo: aPositionDestination 
+
+! !
+
+!TerniLapilliXMovesState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:16:02'!
+nextStateFor: aTerniLapilliGame
+	aTerniLapilliGame XXXXXXXverifyXIsWinner ifTrue: [^TerniLapilliXWinsState new] ifFalse: [^TerniLapilliOMovesState new]! !
+
+!TerniLapilliXMovesState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:46:42'!
+putXAt: aPosition in: aTerniLapilliGame
+	^aTerniLapilliGame signalPlayingInMovePhase! !
+
+
+!classDefinition: #TerniLapilliXPlaysState category: #TerniLapilli!
+TerniLapilliXTurnState subclass: #TerniLapilliXPlaysState
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TerniLapilli'!
+
+!TerniLapilliXPlaysState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:46:27'!
+moveXFrom: positionToken to: aPositionDestination in: aTerniLapilliGame
+	^aTerniLapilliGame signalMovingInPlayPhase
+	! !
+
+!TerniLapilliXPlaysState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:16:10'!
+nextStateFor: aTerniLapilliGame
+	aTerniLapilliGame XXXXXXXverifyXIsWinner ifTrue: [^TerniLapilliXWinsState new] ifFalse: [^TerniLapilliOPlaysState new]! !
+
+!TerniLapilliXPlaysState methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 16:54:12'!
+putXAt: aPosition in: aTerniLapilliGame
+	aTerniLapilliGame addXTokenAt: aPosition 
+! !
