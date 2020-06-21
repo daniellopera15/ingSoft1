@@ -5,17 +5,15 @@ TestCase subclass: #PortfolioTest
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
 
-!PortfolioTest methodsFor: 'tree validation testing' stamp: 'DL 6/21/2020 17:32:41'!
+!PortfolioTest methodsFor: 'tree validation testing' stamp: 'DL 6/21/2020 19:16:34'!
 test20PortfolioCantAddSelf
 
 	| portfolio |
 	portfolio := Portfolio new.
 	
-	self should: [portfolio add: portfolio]
-		raise: Error
-		withMessageText: Portfolio cantBreakTreeStructureErrorDescription.! !
+	self assertTreeStructureBrokenWhen: portfolio adds: portfolio.! !
 
-!PortfolioTest methodsFor: 'tree validation testing' stamp: 'DL 6/21/2020 17:34:20'!
+!PortfolioTest methodsFor: 'tree validation testing' stamp: 'DL 6/21/2020 19:16:51'!
 test21PortfolioCantAddTwiceSameAccount
 
 	| portfolio account |
@@ -23,11 +21,9 @@ test21PortfolioCantAddTwiceSameAccount
 	account := ReceptiveAccount new.
 	portfolio add: account.
 	
-	self should: [portfolio add: account]
-		raise: Error
-		withMessageText: Portfolio cantBreakTreeStructureErrorDescription.! !
+	self assertTreeStructureBrokenWhen: portfolio adds: account.! !
 
-!PortfolioTest methodsFor: 'tree validation testing' stamp: 'DL 6/21/2020 17:36:35'!
+!PortfolioTest methodsFor: 'tree validation testing' stamp: 'DL 6/21/2020 19:17:14'!
 test22PortfolioCantAddTwiceSamePortfolio
 
 	| portfolio portfolio2 |
@@ -35,11 +31,9 @@ test22PortfolioCantAddTwiceSamePortfolio
 	portfolio2 := Portfolio new.
 	portfolio add: portfolio2.
 	
-	self should: [portfolio add: portfolio2]
-		raise: Error
-		withMessageText: Portfolio cantBreakTreeStructureErrorDescription.! !
+	self assertTreeStructureBrokenWhen: portfolio adds: portfolio2.! !
 
-!PortfolioTest methodsFor: 'tree validation testing' stamp: 'DL 6/21/2020 17:37:50'!
+!PortfolioTest methodsFor: 'tree validation testing' stamp: 'DL 6/21/2020 19:17:35'!
 test23PortfolioCantAddAccountAlreadyInChildPortfolio
 
 	| portfolio portfolio2 account |
@@ -50,11 +44,9 @@ test23PortfolioCantAddAccountAlreadyInChildPortfolio
 	portfolio2 add: account.
 	portfolio add: portfolio2. 
 	
-	self should: [portfolio add: account]
-		raise: Error
-		withMessageText: Portfolio cantBreakTreeStructureErrorDescription.! !
+	self assertTreeStructureBrokenWhen: portfolio adds: account.! !
 
-!PortfolioTest methodsFor: 'tree validation testing' stamp: 'DL 6/21/2020 17:39:08'!
+!PortfolioTest methodsFor: 'tree validation testing' stamp: 'DL 6/21/2020 19:17:50'!
 test24PortfolioCantAddAPortofolioWithAccountAlreadyAdded
 
 	| portfolio portfolio2 account |
@@ -64,12 +56,10 @@ test24PortfolioCantAddAPortofolioWithAccountAlreadyAdded
 	account := ReceptiveAccount new.
 	portfolio add: account.
 	portfolio2 add: account.
-	 
-	self should: [portfolio add: portfolio2]
-		raise: Error
-		withMessageText: Portfolio cantBreakTreeStructureErrorDescription.! !
+	
+	self assertTreeStructureBrokenWhen: portfolio adds: portfolio2.! !
 
-!PortfolioTest methodsFor: 'tree validation testing' stamp: 'DL 6/21/2020 17:41:05'!
+!PortfolioTest methodsFor: 'tree validation testing' stamp: 'DL 6/21/2020 19:18:04'!
 test25PortfolioCantAddPortfolioWithAccountAlreadyAddedInChildPortfolio
 
 	| portfolio portfolio2 portfolio3 account |
@@ -82,12 +72,10 @@ test25PortfolioCantAddPortfolioWithAccountAlreadyAddedInChildPortfolio
 	portfolio2 add: account.
 	portfolio3 add: account.
 	portfolio add: portfolio2.
-	 
-	self should: [portfolio add: portfolio3]
-		raise: Error
-		withMessageText: Portfolio cantBreakTreeStructureErrorDescription.! !
+	
+	self assertTreeStructureBrokenWhen: portfolio adds: portfolio3.! !
 
-!PortfolioTest methodsFor: 'tree validation testing' stamp: 'DL 6/21/2020 17:43:35'!
+!PortfolioTest methodsFor: 'tree validation testing' stamp: 'DL 6/21/2020 19:18:24'!
 test26ChildPortfolioCantAddPortfolioWithAccountAlreadyAddedInParent
 
 	| portfolio portfolio2 portfolio3 account |
@@ -99,48 +87,44 @@ test26ChildPortfolioCantAddPortfolioWithAccountAlreadyAddedInParent
 	portfolio add: portfolio2.
 	portfolio add: account.
 	portfolio3 add: account.
-	 
-	self should: [portfolio2 add: portfolio3]
-		raise: Error
-		withMessageText: Portfolio cantBreakTreeStructureErrorDescription.! !
+	
+	self assertTreeStructureBrokenWhen: portfolio adds: portfolio3.! !
 
-!PortfolioTest methodsFor: 'tree validation testing' stamp: 'DL 6/21/2020 17:49:17'!
+!PortfolioTest methodsFor: 'tree validation testing' stamp: 'DL 6/21/2020 19:18:45'!
 test27ChildPortfolioCantAddPortfolioWithAccountAlreadyAddedInRoot
 
-	| portfolio portfolio2 portfolio3 account portfolio4 |
-	portfolio := Portfolio new.
+	| root portfolio2 portfolio3 account portfolio4 |
+	root := Portfolio new.
 	portfolio2 := Portfolio new.
 	portfolio3 := Portfolio new.
 	portfolio4 := Portfolio new.
 	account := ReceptiveAccount new.
 		
-	portfolio add: portfolio2.
+	root add: portfolio2.
 	portfolio2 add: portfolio4.
-	portfolio add: account.
+	root add: account.
 	portfolio3 add: account.
-	 
-	self should: [portfolio4 add: portfolio3]
-		raise: Error
-		withMessageText: Portfolio cantBreakTreeStructureErrorDescription.! !
+	
+	self assertTreeStructureBrokenWhen: portfolio4 adds: portfolio3.
+! !
 
-!PortfolioTest methodsFor: 'tree validation testing' stamp: 'DL 6/21/2020 17:51:10'!
+!PortfolioTest methodsFor: 'tree validation testing' stamp: 'DL 6/21/2020 19:19:03'!
 test28ChildPortfolioCantAddPortfolioWithAccountAlreadyAddedInAnyRoot
 
-	| portfolio portfolio2 portfolio3 account portfolio4 |
-	portfolio := Portfolio new.
+	| root portfolio2 portfolio3 account portfolio4 |
+	root := Portfolio new.
 	portfolio2 := Portfolio new.
 	portfolio3 := Portfolio new.
 	portfolio4 := Portfolio new.
 	account := ReceptiveAccount new.
 		
-	portfolio add: portfolio4.
+	root add: portfolio4.
 	portfolio2 add: portfolio4.
 	portfolio2 add: account.
 	portfolio3 add: account.
 	
-	self should: [portfolio4 add: portfolio3]
-		raise: Error
-		withMessageText: Portfolio cantBreakTreeStructureErrorDescription.! !
+	self assertTreeStructureBrokenWhen: portfolio4 adds: portfolio3.
+	! !
 
 
 !PortfolioTest methodsFor: 'balance testing' stamp: 'DL 6/21/2020 16:42:05'!
@@ -469,6 +453,14 @@ test19ManyNestedPortfolioShouldHaveAllChildTransactions
 	self assert: (OrderedCollection with: transaction2 with: transaction3 with: transaction4) equals: portfolio transactions.
 	! !
 
+
+!PortfolioTest methodsFor: 'assertion' stamp: 'DL 6/21/2020 19:15:52'!
+assertTreeStructureBrokenWhen: aPortfolio adds: aPortfolioEntry
+	
+	self should: [aPortfolio add: aPortfolioEntry]
+		raise: Error
+		withMessageText: Portfolio cantBreakTreeStructureErrorDescription.! !
+
 
 !classDefinition: #ReceptiveAccountTest category: #'Portfolio-Ejercicio'!
 TestCase subclass: #ReceptiveAccountTest
@@ -668,70 +660,130 @@ for: aValue
 	^ self new initializeFor: aValue ! !
 
 
+!classDefinition: #PortfolioEntry category: #'Portfolio-Ejercicio'!
+Object subclass: #PortfolioEntry
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Ejercicio'!
+
+!PortfolioEntry methodsFor: 'testing' stamp: 'DL 6/21/2020 18:31:45'!
+hasRegistered
+	
+	^self subclassResponsibility! !
+
+
+!PortfolioEntry methodsFor: 'balance' stamp: 'DL 6/21/2020 18:31:17'!
+balance
+	
+	^self subclassResponsibility! !
+
+
+!PortfolioEntry methodsFor: 'transactions' stamp: 'DL 6/21/2020 18:32:00'!
+transactions
+	
+	^self subclassResponsibility! !
+
+
+!PortfolioEntry methodsFor: 'adding' stamp: 'DL 6/21/2020 18:36:08'!
+add: aPortfolioEntry
+	
+	^self subclassResponsibility! !
+
+
+!PortfolioEntry methodsFor: 'private' stamp: 'DL 6/21/2020 18:38:52'!
+addOwner: aPortfolio
+	
+	^self subclassResponsibility! !
+
+!PortfolioEntry methodsFor: 'private' stamp: 'DL 6/21/2020 18:42:07'!
+hasAccountInCommonWith: aPortfolioEntry
+	
+	^self subclassResponsibility! !
+
+!PortfolioEntry methodsFor: 'private' stamp: 'DL 6/21/2020 18:32:15'!
+isReachable: aPortfolioEntry
+	
+	^self subclassResponsibility! !
+
+
 !classDefinition: #Portfolio category: #'Portfolio-Ejercicio'!
-Object subclass: #Portfolio
+PortfolioEntry subclass: #Portfolio
 	instanceVariableNames: 'entries parents'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
 
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'DL 6/21/2020 16:39:54'!
-add: aPortfolioEntry 
-	
-	
-	(self hasAnyRootPortfolioAccountInCommonWith: aPortfolioEntry) ifTrue: [self signalTreeStructureBroken].
-	
-	entries add: aPortfolioEntry.
-	(aPortfolioEntry isKindOf: self class) ifTrue: [ aPortfolioEntry addPortfolioOwner: self ].! !
-
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 20:29:26'!
-addPortfolioOwner: aPortfolio 
-	parents add: aPortfolio.! !
-
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 18:05:21'!
+!Portfolio methodsFor: 'balance' stamp: 'MF 6/20/2020 18:05:21'!
 balance
 	^(entries sum: [:account | account balance] ifEmpty: [0])! !
 
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 19:28:38'!
+
+!Portfolio methodsFor: 'testing' stamp: 'MF 6/20/2020 18:05:36'!
+hasRegistered: aTransaction
+	^(entries anySatisfy: [:anAccount | anAccount hasRegistered: aTransaction]).! !
+
+
+!Portfolio methodsFor: 'transactions' stamp: 'DL 6/21/2020 19:20:22'!
+transactions
+	^(entries inject: OrderedCollection new into: [:acc :account | acc , account transactions])
+
+! !
+
+
+!Portfolio methodsFor: 'signals' stamp: 'MF 6/20/2020 18:15:17'!
+signalTreeStructureBroken
+
+	^ self error: self class cantBreakTreeStructureErrorDescription! !
+
+
+!Portfolio methodsFor: 'initialization' stamp: 'MF 6/20/2020 20:15:18'!
+initialize
+	entries := OrderedCollection new.
+	parents := OrderedCollection new.
+! !
+
+
+!Portfolio methodsFor: 'adding' stamp: 'DL 6/21/2020 19:07:19'!
+add: aPortfolioEntry 
+	
+	self validateTreeStructureNotBrokenWhenAdding: aPortfolioEntry.
+	
+	entries add: aPortfolioEntry.
+	
+	"Se dejo este if. Pensamos que si aplicabamos el algoritmo para sacar ifs, y colocábamos el addOwner en PortfolioEntry y ReceptiveAccount no hiciera nada, podía hacer confusa la escencia de ese objeto."
+	
+	(aPortfolioEntry isKindOf: self class) ifTrue: [ aPortfolioEntry addOwner: self ].! !
+
+
+!Portfolio methodsFor: 'private' stamp: 'DL 6/21/2020 18:40:32'!
+addOwner: aPortfolio 
+	parents add: aPortfolio.! !
+
+!Portfolio methodsFor: 'private' stamp: 'MF 6/20/2020 19:28:38'!
 hasAccountInCommonWith: aPortfolioEntry
 	^(aPortfolioEntry isReachable: self) or: [entries anySatisfy: [:entry | entry hasAccountInCommonWith: aPortfolioEntry]]! !
 
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 21:04:23'!
+!Portfolio methodsFor: 'private' stamp: 'MF 6/20/2020 21:04:23'!
 hasAnyRootPortfolioAccountInCommonWith: aPortfolioEntry 
 	
 	self isRootPortfolio ifTrue: [^self hasAccountInCommonWith: aPortfolioEntry].
 	^parents anySatisfy: [:parent | (parent hasAnyRootPortfolioAccountInCommonWith: aPortfolioEntry)].
 	! !
 
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 18:05:36'!
-hasRegistered: aTransaction
-	^(entries anySatisfy: [:anAccount | anAccount hasRegistered: aTransaction]).! !
-
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 20:15:18'!
-initialize
-	entries := OrderedCollection new.
-	parents := OrderedCollection new.
-! !
-
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 18:37:55'!
+!Portfolio methodsFor: 'private' stamp: 'MF 6/20/2020 18:37:55'!
 isReachable: aPortfolioEntry
 	^(aPortfolioEntry = self) or: [entries anySatisfy: [:entry | entry isReachable: aPortfolioEntry]]! !
 
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 21:04:23'!
+!Portfolio methodsFor: 'private' stamp: 'MF 6/20/2020 21:04:23'!
 isRootPortfolio
 
 	^ parents isEmpty! !
 
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 18:15:17'!
-signalTreeStructureBroken
+!Portfolio methodsFor: 'private' stamp: 'DL 6/21/2020 19:07:19'!
+validateTreeStructureNotBrokenWhenAdding: aPortfolioEntry
 
-	^ self error: self class cantBreakTreeStructureErrorDescription! !
-
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 18:05:49'!
-transactions
-		^(entries inject: OrderedCollection new into: [:acc :account | acc , account transactions])
-
-! !
+	^ (self hasAnyRootPortfolioAccountInCommonWith: aPortfolioEntry) ifTrue: [self signalTreeStructureBroken]! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -745,17 +797,16 @@ cantBreakTreeStructureErrorDescription
 
 
 !classDefinition: #ReceptiveAccount category: #'Portfolio-Ejercicio'!
-Object subclass: #ReceptiveAccount
-	instanceVariableNames: 'transactions parents'
+PortfolioEntry subclass: #ReceptiveAccount
+	instanceVariableNames: 'transactions'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
 
-!ReceptiveAccount methodsFor: 'initialization' stamp: 'MF 6/20/2020 20:15:34'!
+!ReceptiveAccount methodsFor: 'initialization' stamp: 'DL 6/21/2020 18:53:36'!
 initialize
 
-	transactions := OrderedCollection new.
-	parents := OrderedCollection new.! !
+	transactions := OrderedCollection new.! !
 
 
 !ReceptiveAccount methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 18:37'!
@@ -775,17 +826,18 @@ balance
 
 	^transactions inject: 0 into: [:balance :aTransaction | aTransaction applyToBalance: balance]. ! !
 
-!ReceptiveAccount methodsFor: 'balance' stamp: 'MF 6/20/2020 19:29:05'!
-hasAccountInCommonWith: aPortfolioEntry
-	^aPortfolioEntry isReachable: self! !
-
-!ReceptiveAccount methodsFor: 'balance' stamp: 'MF 6/20/2020 18:38:56'!
-isReachable: aPortfolioEntry
-	^aPortfolioEntry = self! !
-
 
 !ReceptiveAccount methodsFor: 'testing' stamp: 'NR 10/17/2019 03:28:43'!
 hasRegistered: aTransaction
 
 	^ transactions includes: aTransaction 
 ! !
+
+
+!ReceptiveAccount methodsFor: 'private' stamp: 'MF 6/20/2020 19:29:05'!
+hasAccountInCommonWith: aPortfolioEntry
+	^aPortfolioEntry isReachable: self! !
+
+!ReceptiveAccount methodsFor: 'private' stamp: 'MF 6/20/2020 18:38:56'!
+isReachable: aPortfolioEntry
+	^aPortfolioEntry = self! !
