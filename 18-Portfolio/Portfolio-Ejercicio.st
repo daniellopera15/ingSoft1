@@ -5,413 +5,8 @@ TestCase subclass: #PortfolioTest
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 19:42:13'!
-test01
-
-	| portfolio |
-	portfolio := Portfolio new.
-	
-	self assert: 0 equals: portfolio balance.
-	
-	! !
-
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 19:49:09'!
-test02
-
-	| portfolio account |
-	portfolio := Portfolio new.
-
-	account := ReceptiveAccount new.
-	portfolio addAccount: account. 
-	
-	self assert: 0 equals: portfolio balance.
-	
-	! !
-
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 19:51:34'!
-test03
-
-	| portfolio account |
-	portfolio := Portfolio new.
-
-	account := ReceptiveAccount new.
-	Deposit register: 100 on: account. 
-	portfolio addAccount: account. 
-	
-	self assert: 100 equals: portfolio balance.
-	
-	! !
-
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 20:02:05'!
-test04
-
-	| portfolio account secondAccount |
-	portfolio := Portfolio new.
-
-	account := ReceptiveAccount new.
-	Deposit register: 100 on: account.
-
-	secondAccount  := ReceptiveAccount  new.
-	Withdraw register: 50 on: secondAccount.
-	 
-	portfolio addAccount: account.
-	portfolio addAccount: secondAccount. 
-	
-	self assert: 50 equals: portfolio balance.
-	
-	! !
-
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 20:11:39'!
-test05
-
-	| portfolio account secondAccount thirdAccount |
-	portfolio := Portfolio new.
-
-	account := ReceptiveAccount new.
-	Deposit register: 100 on: account.
-
-	secondAccount  := ReceptiveAccount  new.
-	Withdraw register: 50 on: secondAccount.
-
-	thirdAccount := ReceptiveAccount new.
-	Deposit register: 25 on: thirdAccount.
-	 
-	portfolio addAccount: account.
-	portfolio addAccount: secondAccount.
-	portfolio addAccount: thirdAccount .
-	
-	self assert: 75 equals: portfolio balance.
-	
-	! !
-
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 20:47:13'!
-test06
-
-	| portfolio account transaction |
-	portfolio := Portfolio new.
-
-	account := ReceptiveAccount new.
-	transaction := Deposit register: 100 on: account.
-	 	
-	self deny: (portfolio hasRegistered: transaction).
-	! !
-
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 20:46:35'!
-test07
-
-	| portfolio account transaction |
-	portfolio := Portfolio new.
-
-	account := ReceptiveAccount new.
-	transaction := Deposit register: 100 on: account.
-	 
-	portfolio addAccount: account.
-	
-	self assert: (portfolio hasRegistered: transaction).
-	! !
-
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 20:50:55'!
-test08
-
-	| portfolio account account2 transaction2 |
-	portfolio := Portfolio new.
-
-	account := ReceptiveAccount new.
-	Deposit register: 200 on: account.
-	
-	account2 := ReceptiveAccount new.
-	transaction2 := Deposit register: 200 on: account2.
-	 
-	portfolio addAccount: account.
-	
-	self deny: (portfolio hasRegistered: transaction2).
-	! !
-
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 21:00:13'!
-test09
-
-	| portfolio account account2 account3 transaction |
-	portfolio := Portfolio new.
-
-	account := ReceptiveAccount new.
-	Deposit register: 200 on: account.
-	Withdraw  register: 100 on: account.
-	
-	account2 := ReceptiveAccount  new.
-	Deposit register: 50 on: account2.
-	
-	account3 := ReceptiveAccount  new.
-	transaction := Deposit register: 50 on: account3.
-	 
-	portfolio addAccount: account.
-	portfolio addAccount: account2.
-	portfolio addAccount: account3.
-	
-	self assert: (portfolio hasRegistered: transaction).
-	! !
-
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 21:03:04'!
-test10
-
-	| portfolio |
-	portfolio := Portfolio new.
-
-	self assert: portfolio transactions isEmpty.
-	! !
-
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 21:06:46'!
-test11
-
-	| portfolio account transaction|
-	portfolio := Portfolio new.
-
-	account := ReceptiveAccount new.
-	transaction := Deposit register: 100 on: account. 	
-	
-	portfolio addAccount: account.
-
-	self assert: (OrderedCollection with: transaction) equals: portfolio transactions.
-	! !
-
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MF 6/18/2020 21:13:00'!
-test12
-
-	| portfolio account transaction account2 transaction2 account3 transaction3|
-	portfolio := Portfolio new.
-
-	account := ReceptiveAccount new.
-	transaction := Deposit register: 100 on: account. 
-	
-	account2 := ReceptiveAccount new.
-	transaction2 := Deposit register: 100 on: account. 
-	
-	account3 := ReceptiveAccount new.
-	transaction3 := Deposit register: 100 on: account. 	
-	
-	portfolio addAccount: account.
-	portfolio addAccount: account2.
-	portfolio addAccount: account3.
-
-	self assert: (OrderedCollection with: transaction with: transaction2 with: transaction3) 
-		equals: portfolio transactions.
-	! !
-
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 16:42:52'!
-test13
-
-	| portfolio account portfolio2 |
-	portfolio := Portfolio new.
-	portfolio2 := Portfolio new.
-
-	account := ReceptiveAccount new.
-	
-	portfolio addAccount: account.
-	portfolio addPortfolio: portfolio2.
-
-	self assert: 0 equals: portfolio balance.
-	! !
-
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 16:46:13'!
-test14
-
-	| portfolio account portfolio2 account2 |
-	portfolio := Portfolio new.
-	portfolio2 := Portfolio new.
-
-	account := ReceptiveAccount new.
-	Deposit register: 100 on: account. 
-	
-	account2 := ReceptiveAccount new.
-	Deposit register: 100 on: account2.
-	
-	portfolio addAccount: account.
-	portfolio2 addAccount: account2.
-	portfolio addPortfolio: portfolio2.
-
-	self assert: 200 equals: portfolio balance.
-	! !
-
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 16:50:47'!
-test15
-
-	| portfolio account portfolio2 account2 |
-	portfolio := Portfolio new.
-	portfolio2 := Portfolio new.
-
-	account := ReceptiveAccount new.
-	Deposit register: 100 on: account. 
-	
-	account2 := ReceptiveAccount new.
-	Deposit register: 100 on: account2.
-	
-	portfolio addAccount: account.
-	portfolio2 addAccount: account2.
-	portfolio addPortfolio: portfolio2.
-
-	self assert: 100 equals: portfolio2 balance.
-	! !
-
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 16:56:39'!
-test16
-
-	| portfolio account portfolio2 account2 |
-	portfolio := Portfolio new.
-	portfolio2 := Portfolio new.
-
-	account := ReceptiveAccount new.
-	
-	account2 := ReceptiveAccount new.
-	Deposit register: 100 on: account2.
-	
-	portfolio addAccount: account.
-	portfolio2 addAccount: account2.
-	portfolio addPortfolio: portfolio2.
-
-	self assert: 100 equals: portfolio balance.
-	! !
-
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 16:58:13'!
-test17
-
-	| portfolio account portfolio2 account2 |
-	portfolio := Portfolio new.
-	portfolio2 := Portfolio new.
-
-	account := ReceptiveAccount new.
-	Deposit register: 100 on: account.
-
-	account2 := ReceptiveAccount new.
-	
-	portfolio addAccount: account.
-	portfolio2 addAccount: account2.
-	portfolio addPortfolio: portfolio2.
-
-	self assert: 100 equals: portfolio balance.
-	! !
-
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 17:02:55'!
-test18
-
-	| portfolio portfolio2 account2  account3 portfolio3 |
-	portfolio := Portfolio new.
-	portfolio2 := Portfolio new.
-	portfolio3 := Portfolio new.
-
-	account2 := ReceptiveAccount new.
-	Deposit register: 100 on: account2.
-
-	account3 := ReceptiveAccount new.
-	
-	portfolio2 addAccount: account2.
-	portfolio3 addAccount: account3.
-	portfolio addPortfolio: portfolio2.
-	portfolio addPortfolio: portfolio3.
-
-	self assert: 100 equals: portfolio balance.
-	! !
-
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 17:03:59'!
-test19
-
-	| portfolio portfolio2 account2  account3 portfolio3 |
-	portfolio := Portfolio new.
-	portfolio2 := Portfolio new.
-	portfolio3 := Portfolio new.
-
-	account2 := ReceptiveAccount new.
-	Deposit register: 100 on: account2.
-
-	account3 := ReceptiveAccount new.
-	Withdraw register: 50 on: account3.
-	
-	portfolio2 addAccount: account2.
-	portfolio3 addAccount: account3.
-	portfolio addPortfolio: portfolio2.
-	portfolio addPortfolio: portfolio3.
-
-	self assert: 50 equals: portfolio balance.
-	
-	! !
-
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 17:16:09'!
-test20
-
-	| portfolio transaction account2 portfolio2 |
-	portfolio := Portfolio new.
-	
-	portfolio2 := Portfolio new.
-	account2 := ReceptiveAccount  new.
-	transaction := Deposit register: 100 on: account2.
-
-	portfolio2 addAccount: account2.
-	portfolio addPortfolio: portfolio2.
-	 	
-	self assert: (portfolio hasRegistered: transaction).
-	! !
-
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 17:25:07'!
-test21
-
-	| portfolio transaction account2 portfolio2 portfolio3 portfolio4 |
-	portfolio := Portfolio new.
-	portfolio2 := Portfolio new.
-	portfolio3  := Portfolio  new.
-	portfolio4 := Portfolio new.
-	
-	portfolio2 := Portfolio new.
-	account2 := ReceptiveAccount  new.
-	transaction := Deposit register: 100 on: account2.
-
-	portfolio4 addAccount: account2.
-	portfolio addPortfolio: portfolio2.
-	portfolio addPortfolio: portfolio3.
-	portfolio addPortfolio: portfolio4.
-	 	
-	self assert: (portfolio hasRegistered: transaction).
-	! !
-
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 17:35:44'!
-test22
-
-	| portfolio account2 portfolio2 transaction |
-	portfolio := Portfolio new.
-	portfolio2 := Portfolio new.
-	
-	account2 := ReceptiveAccount new.
-	transaction := Deposit register: 100 on: account2.
-	
-	portfolio2 addAccount: account2.
-	portfolio addPortfolio: portfolio2. 
-
-	self assert: (OrderedCollection with: transaction) equals: portfolio transactions.
-	! !
-
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 18:06:55'!
-test23
-
-	| portfolio account2 portfolio2 account3 account4 portfolio3 transaction2 transaction3 transaction4 |
-	portfolio := Portfolio new.
-	portfolio2 := Portfolio new.
-	portfolio3 := Portfolio new.
-	
-	account2 := ReceptiveAccount new.
-	transaction2 := Deposit register: 100 on: account2.
-	account3 := ReceptiveAccount new.
-	transaction3 := Withdraw register: 50 on: account3.
-	account4 := ReceptiveAccount new.
-	transaction4 := Deposit register: 25 on: account4.
-	
-	portfolio2 addAccount: account2.
-	portfolio3 addAccount: account3.
-	portfolio addPortfolio: portfolio2.
-	portfolio addPortfolio: portfolio3.
-	portfolio addAccount: account4.
-
-	self assert: (OrderedCollection with: transaction2 with: transaction3 with: transaction4) equals: portfolio transactions.
-	! !
-
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 18:11:21'!
-test24
+!PortfolioTest methodsFor: 'tree validation testing' stamp: 'DL 6/21/2020 17:32:41'!
+test20PortfolioCantAddSelf
 
 	| portfolio |
 	portfolio := Portfolio new.
@@ -420,8 +15,8 @@ test24
 		raise: Error
 		withMessageText: Portfolio cantBreakTreeStructureErrorDescription.! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 18:16:46'!
-test25
+!PortfolioTest methodsFor: 'tree validation testing' stamp: 'DL 6/21/2020 17:34:20'!
+test21PortfolioCantAddTwiceSameAccount
 
 	| portfolio account |
 	portfolio := Portfolio new.
@@ -432,8 +27,8 @@ test25
 		raise: Error
 		withMessageText: Portfolio cantBreakTreeStructureErrorDescription.! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 18:20:09'!
-test26
+!PortfolioTest methodsFor: 'tree validation testing' stamp: 'DL 6/21/2020 17:36:35'!
+test22PortfolioCantAddTwiceSamePortfolio
 
 	| portfolio portfolio2 |
 	portfolio := Portfolio new.
@@ -444,30 +39,8 @@ test26
 		raise: Error
 		withMessageText: Portfolio cantBreakTreeStructureErrorDescription.! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 18:07:31'!
-test26CHECKLATERXXXXXXXXXXXXXXX
-
-	"Ver si tiene sentido este test desde un aspecto funcional."
-
-	| portfolio account2 portfolio2 portfolio3 |
-	portfolio := Portfolio new.
-	portfolio2 := Portfolio new.
-	portfolio3 := Portfolio new.
-	
-	account2 := ReceptiveAccount new.
-	Deposit register: 100 on: account2.
-
-	portfolio addAccount: account2.
-	portfolio2 addAccount: account2.
-	portfolio addPortfolio: portfolio3.
-	portfolio2 addPortfolio: portfolio3.
-
-	self assert: portfolio balance equals: portfolio2 balance.
-	self assert: portfolio transactions equals: portfolio2 transactions.
-! !
-
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 18:23:41'!
-test27
+!PortfolioTest methodsFor: 'tree validation testing' stamp: 'DL 6/21/2020 17:37:50'!
+test23PortfolioCantAddAccountAlreadyInChildPortfolio
 
 	| portfolio portfolio2 account |
 	portfolio := Portfolio new.
@@ -481,8 +54,8 @@ test27
 		raise: Error
 		withMessageText: Portfolio cantBreakTreeStructureErrorDescription.! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 18:40:15'!
-test28
+!PortfolioTest methodsFor: 'tree validation testing' stamp: 'DL 6/21/2020 17:39:08'!
+test24PortfolioCantAddAPortofolioWithAccountAlreadyAdded
 
 	| portfolio portfolio2 account |
 	portfolio := Portfolio new.
@@ -496,8 +69,8 @@ test28
 		raise: Error
 		withMessageText: Portfolio cantBreakTreeStructureErrorDescription.! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 19:00:50'!
-test29
+!PortfolioTest methodsFor: 'tree validation testing' stamp: 'DL 6/21/2020 17:41:05'!
+test25PortfolioCantAddPortfolioWithAccountAlreadyAddedInChildPortfolio
 
 	| portfolio portfolio2 portfolio3 account |
 	portfolio := Portfolio new.
@@ -514,8 +87,8 @@ test29
 		raise: Error
 		withMessageText: Portfolio cantBreakTreeStructureErrorDescription.! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 20:30:16'!
-test30
+!PortfolioTest methodsFor: 'tree validation testing' stamp: 'DL 6/21/2020 17:43:35'!
+test26ChildPortfolioCantAddPortfolioWithAccountAlreadyAddedInParent
 
 	| portfolio portfolio2 portfolio3 account |
 	portfolio := Portfolio new.
@@ -531,8 +104,8 @@ test30
 		raise: Error
 		withMessageText: Portfolio cantBreakTreeStructureErrorDescription.! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 20:32:20'!
-test31
+!PortfolioTest methodsFor: 'tree validation testing' stamp: 'DL 6/21/2020 17:49:17'!
+test27ChildPortfolioCantAddPortfolioWithAccountAlreadyAddedInRoot
 
 	| portfolio portfolio2 portfolio3 account portfolio4 |
 	portfolio := Portfolio new.
@@ -545,14 +118,13 @@ test31
 	portfolio2 add: portfolio4.
 	portfolio add: account.
 	portfolio3 add: account.
-	
 	 
 	self should: [portfolio4 add: portfolio3]
 		raise: Error
 		withMessageText: Portfolio cantBreakTreeStructureErrorDescription.! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 20:51:05'!
-test32
+!PortfolioTest methodsFor: 'tree validation testing' stamp: 'DL 6/21/2020 17:51:10'!
+test28ChildPortfolioCantAddPortfolioWithAccountAlreadyAddedInAnyRoot
 
 	| portfolio portfolio2 portfolio3 account portfolio4 |
 	portfolio := Portfolio new.
@@ -566,10 +138,336 @@ test32
 	portfolio2 add: account.
 	portfolio3 add: account.
 	
-	 
 	self should: [portfolio4 add: portfolio3]
 		raise: Error
 		withMessageText: Portfolio cantBreakTreeStructureErrorDescription.! !
+
+
+!PortfolioTest methodsFor: 'balance testing' stamp: 'DL 6/21/2020 16:42:05'!
+test01EmptyPortfolioShouldHaveBalanceInCero
+
+	| portfolio |
+	portfolio := Portfolio new.
+	
+	self assert: 0 equals: portfolio balance.
+	
+	! !
+
+!PortfolioTest methodsFor: 'balance testing' stamp: 'DL 6/21/2020 16:43:05'!
+test02PortfolioWithEmptyAccountShouldHaveBalanceCero
+
+	| portfolio account |
+	portfolio := Portfolio new.
+
+	account := ReceptiveAccount new.
+	portfolio add: account. 
+	
+	self assert: 0 equals: portfolio balance.
+	
+	! !
+
+!PortfolioTest methodsFor: 'balance testing' stamp: 'DL 6/21/2020 16:46:53'!
+test03PortfolioWithAccountShouldSameBalance
+
+	| portfolio account |
+	portfolio := Portfolio new.
+
+	account := ReceptiveAccount new.
+	Deposit register: 100 on: account. 
+	portfolio add: account. 
+	
+	self assert: 100 equals: portfolio balance.
+	
+	! !
+
+!PortfolioTest methodsFor: 'balance testing' stamp: 'DL 6/21/2020 16:53:27'!
+test04PortfolioWithManyAccountsBalanceShouldSumTheirBalance
+
+	| portfolio account secondAccount thirdAccount |
+	portfolio := Portfolio new.
+
+	account := ReceptiveAccount new.
+	Deposit register: 100 on: account.
+
+	secondAccount  := ReceptiveAccount  new.
+	Withdraw register: 50 on: secondAccount.
+
+	thirdAccount := ReceptiveAccount new.
+	Deposit register: 25 on: thirdAccount.
+	 
+	portfolio add: account.
+	portfolio add: secondAccount.
+	portfolio add: thirdAccount .
+	
+	self assert: 75 equals: portfolio balance.
+	
+	! !
+
+!PortfolioTest methodsFor: 'balance testing' stamp: 'DL 6/21/2020 17:09:28'!
+test12NestedPortofolioWithEmptyAccountShouldHaveBalanceCero
+
+	| portfolio account portfolio2 |
+	portfolio := Portfolio new.
+	portfolio2 := Portfolio new.
+
+	account := ReceptiveAccount new.
+	
+	portfolio add: account.
+	portfolio add: portfolio2.
+
+	self assert: 0 equals: portfolio balance.
+	! !
+
+!PortfolioTest methodsFor: 'balance testing' stamp: 'DL 6/21/2020 17:13:36'!
+test13NestedPortfolioWithAccountRootShouldHaveSumBalance
+
+	| portfolio account portfolio2 account2 |
+	portfolio := Portfolio new.
+	portfolio2 := Portfolio new.
+
+	account := ReceptiveAccount new.
+	Deposit register: 100 on: account. 
+	
+	account2 := ReceptiveAccount new.
+	Deposit register: 100 on: account2.
+	
+	portfolio add: account.
+	portfolio2 add: account2.
+	portfolio add: portfolio2.
+
+	self assert: 200 equals: portfolio balance.
+	! !
+
+!PortfolioTest methodsFor: 'balance testing' stamp: 'DL 6/21/2020 17:14:53'!
+test14NestedPortfolioWithAccountChildShouldHaveOnlyOwnBalance
+
+	| portfolio account portfolio2 account2 |
+	portfolio := Portfolio new.
+	portfolio2 := Portfolio new.
+
+	account := ReceptiveAccount new.
+	Deposit register: 100 on: account. 
+	
+	account2 := ReceptiveAccount new.
+	Deposit register: 100 on: account2.
+	
+	portfolio add: account.
+	portfolio2 add: account2.
+	portfolio add: portfolio2.
+
+	self assert: 100 equals: portfolio2 balance.
+	! !
+
+!PortfolioTest methodsFor: 'balance testing' stamp: 'DL 6/21/2020 17:21:12'!
+test15NestedManyPortfoliosWithAccountShouldSumAllBalances
+
+	| portfolio portfolio2 account2  account3 portfolio3 |
+	portfolio := Portfolio new.
+	portfolio2 := Portfolio new.
+	portfolio3 := Portfolio new.
+
+	account2 := ReceptiveAccount new.
+	Deposit register: 100 on: account2.
+
+	account3 := ReceptiveAccount new.
+	
+	portfolio2 add: account2.
+	portfolio3 add: account3.
+	portfolio add: portfolio2.
+	portfolio add: portfolio3.
+
+	self assert: 100 equals: portfolio balance.
+	! !
+
+
+!PortfolioTest methodsFor: 'transactions testing' stamp: 'DL 6/21/2020 16:55:05'!
+test05EmptyPortfolioShoulNotHaveTransactions
+
+	| portfolio account transaction |
+	portfolio := Portfolio new.
+
+	account := ReceptiveAccount new.
+	transaction := Deposit register: 100 on: account.
+	 	
+	self deny: (portfolio hasRegistered: transaction).
+	! !
+
+!PortfolioTest methodsFor: 'transactions testing' stamp: 'DL 6/21/2020 16:57:51'!
+test06PortfolioWithAnAccountWithTransactionShouldHaveItRegistered
+
+	| portfolio account transaction |
+	portfolio := Portfolio new.
+
+	account := ReceptiveAccount new.
+	transaction := Deposit register: 100 on: account.
+	 
+	portfolio add: account.
+	
+	self assert: (portfolio hasRegistered: transaction).
+	! !
+
+!PortfolioTest methodsFor: 'transactions testing' stamp: 'DL 6/21/2020 16:59:55'!
+test07PortfolioShouldNotHaveRegisteredTransactionsNotInAccounts
+
+	| portfolio account account2 transaction2 |
+	portfolio := Portfolio new.
+
+	account := ReceptiveAccount new.
+	Deposit register: 200 on: account.
+	
+	account2 := ReceptiveAccount new.
+	transaction2 := Deposit register: 200 on: account2.
+	 
+	portfolio add: account.
+	
+	self deny: (portfolio hasRegistered: transaction2).
+	! !
+
+!PortfolioTest methodsFor: 'transactions testing' stamp: 'DL 6/21/2020 17:02:32'!
+test08PortfolioHaveRegisteredATransactionInAnyHisAccounts
+
+	| portfolio account account2 account3 transaction |
+	portfolio := Portfolio new.
+
+	account := ReceptiveAccount new.
+	Deposit register: 200 on: account.
+	Withdraw  register: 100 on: account.
+	
+	account2 := ReceptiveAccount  new.
+	Deposit register: 50 on: account2.
+	
+	account3 := ReceptiveAccount  new.
+	transaction := Deposit register: 50 on: account3.
+	 
+	portfolio add: account.
+	portfolio add: account2.
+	portfolio add: account3.
+	
+	self assert: (portfolio hasRegistered: transaction).
+	! !
+
+!PortfolioTest methodsFor: 'transactions testing' stamp: 'DL 6/21/2020 17:03:15'!
+test09EmptyPortfolioShouldNotHaveTransactions
+
+	| portfolio |
+	portfolio := Portfolio new.
+
+	self assert: portfolio transactions isEmpty.
+	! !
+
+!PortfolioTest methodsFor: 'transactions testing' stamp: 'DL 6/21/2020 17:04:41'!
+test10PortfolioWithAccountTransactionsShouldHaveTheAccountTransactions
+
+	| portfolio account transaction|
+	portfolio := Portfolio new.
+
+	account := ReceptiveAccount new.
+	transaction := Deposit register: 100 on: account. 	
+	
+	portfolio add: account.
+
+	self assert: (OrderedCollection with: transaction) equals: portfolio transactions.
+	! !
+
+!PortfolioTest methodsFor: 'transactions testing' stamp: 'DL 6/21/2020 17:06:31'!
+test11PortfolioWithManyAccountsShouldHaveAllTransactions
+
+	| portfolio account transaction account2 transaction2 account3 transaction3|
+	portfolio := Portfolio new.
+
+	account := ReceptiveAccount new.
+	transaction := Deposit register: 100 on: account. 
+	
+	account2 := ReceptiveAccount new.
+	transaction2 := Deposit register: 100 on: account. 
+	
+	account3 := ReceptiveAccount new.
+	transaction3 := Deposit register: 100 on: account. 	
+	
+	portfolio add: account.
+	portfolio add: account2.
+	portfolio add: account3.
+
+	self assert: (OrderedCollection with: transaction with: transaction2 with: transaction3) 
+		equals: portfolio transactions.
+	! !
+
+!PortfolioTest methodsFor: 'transactions testing' stamp: 'DL 6/21/2020 17:25:22'!
+test16NestedPortfoliosShouldHaveRegisteredTransactionIfAnyChildHas
+
+	| portfolio transaction account2 portfolio2 |
+	portfolio := Portfolio new.
+	
+	portfolio2 := Portfolio new.
+	account2 := ReceptiveAccount  new.
+	transaction := Deposit register: 100 on: account2.
+
+	portfolio2 add: account2.
+	portfolio add: portfolio2.
+	 	
+	self assert: (portfolio hasRegistered: transaction).
+	! !
+
+!PortfolioTest methodsFor: 'transactions testing' stamp: 'DL 6/21/2020 17:27:41'!
+test17DoubleNestedPortfoliosShouldHaveRegisteredTransactionIfAnyChildHas
+
+	| portfolio transaction account2 portfolio2 portfolio3 portfolio4 |
+	portfolio := Portfolio new.
+	portfolio2 := Portfolio new.
+	portfolio3  := Portfolio  new.
+	portfolio4 := Portfolio new.
+	
+	portfolio2 := Portfolio new.
+	account2 := ReceptiveAccount  new.
+	transaction := Deposit register: 100 on: account2.
+
+	portfolio4 add: account2.
+	portfolio add: portfolio2.
+	portfolio add: portfolio3.
+	portfolio add: portfolio4.
+	 	
+	self assert: (portfolio hasRegistered: transaction).
+	! !
+
+!PortfolioTest methodsFor: 'transactions testing' stamp: 'DL 6/21/2020 17:30:01'!
+test18NestedPortfolioShouldHaveAllTransactions
+
+	| portfolio account2 portfolio2 transaction |
+	portfolio := Portfolio new.
+	portfolio2 := Portfolio new.
+	
+	account2 := ReceptiveAccount new.
+	transaction := Deposit register: 100 on: account2.
+	
+	portfolio2 add: account2.
+	portfolio add: portfolio2. 
+
+	self assert: (OrderedCollection with: transaction) equals: portfolio transactions.
+	! !
+
+!PortfolioTest methodsFor: 'transactions testing' stamp: 'DL 6/21/2020 17:31:55'!
+test19ManyNestedPortfolioShouldHaveAllChildTransactions
+
+	| portfolio account2 portfolio2 account3 account4 portfolio3 transaction2 transaction3 transaction4 |
+	portfolio := Portfolio new.
+	portfolio2 := Portfolio new.
+	portfolio3 := Portfolio new.
+	
+	account2 := ReceptiveAccount new.
+	transaction2 := Deposit register: 100 on: account2.
+	account3 := ReceptiveAccount new.
+	transaction3 := Withdraw register: 50 on: account3.
+	account4 := ReceptiveAccount new.
+	transaction4 := Deposit register: 25 on: account4.
+	
+	portfolio2 add: account2.
+	portfolio3 add: account3.
+	portfolio add: portfolio2.
+	portfolio add: portfolio3.
+	portfolio add: account4.
+
+	self assert: (OrderedCollection with: transaction2 with: transaction3 with: transaction4) equals: portfolio transactions.
+	! !
 
 
 !classDefinition: #ReceptiveAccountTest category: #'Portfolio-Ejercicio'!
@@ -675,6 +573,12 @@ value
 
 	self subclassResponsibility ! !
 
+
+!AccountTransaction methodsFor: 'balance operation' stamp: 'DL 6/21/2020 18:20:34'!
+applyToBalance: balance
+
+	^self subclassResponsibility.! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'AccountTransaction class' category: #'Portfolio-Ejercicio'!
@@ -705,10 +609,16 @@ initializeFor: aValue
 	value := aValue ! !
 
 
-!Deposit methodsFor: 'value' stamp: 'HernanWilkinson 7/13/2011 18:38'!
+!Deposit methodsFor: 'value' stamp: 'DL 6/21/2020 18:19:48'!
 value
 
 	^ value! !
+
+
+!Deposit methodsFor: 'balance operation' stamp: 'DL 6/21/2020 18:21:58'!
+applyToBalance: balance
+
+	^ balance + self value.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -740,6 +650,12 @@ value
 
 	^ value! !
 
+
+!Withdraw methodsFor: 'balance operation' stamp: 'DL 6/21/2020 18:22:11'!
+applyToBalance: balance
+
+	^ balance - self value.! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Withdraw class' category: #'Portfolio-Ejercicio'!
@@ -759,7 +675,7 @@ Object subclass: #Portfolio
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
 
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 20:55:37'!
+!Portfolio methodsFor: 'as yet unclassified' stamp: 'DL 6/21/2020 16:39:54'!
 add: aPortfolioEntry 
 	
 	
@@ -767,15 +683,6 @@ add: aPortfolioEntry
 	
 	entries add: aPortfolioEntry.
 	(aPortfolioEntry isKindOf: self class) ifTrue: [ aPortfolioEntry addPortfolioOwner: self ].! !
-
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 18:05:58'!
-addAccount: aReceptiveAccount 
-	entries add: aReceptiveAccount.! !
-
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 18:06:05'!
-addPortfolio: aPortfolio 
-	entries add: aPortfolio.
-	! !
 
 !Portfolio methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 20:29:26'!
 addPortfolioOwner: aPortfolio 
@@ -863,10 +770,10 @@ transactions
 	^ transactions copy! !
 
 
-!ReceptiveAccount methodsFor: 'balance' stamp: 'MF 6/18/2020 19:29:29'!
+!ReceptiveAccount methodsFor: 'balance' stamp: 'DL 6/21/2020 18:23:58'!
 balance
 
-	^transactions sum: [ :aTransaction | (aTransaction isKindOf: Deposit) ifTrue: [aTransaction value] ifFalse: [aTransaction value negated] ] ifEmpty: [ 0 ]! !
+	^transactions inject: 0 into: [:balance :aTransaction | aTransaction applyToBalance: balance]. ! !
 
 !ReceptiveAccount methodsFor: 'balance' stamp: 'MF 6/20/2020 19:29:05'!
 hasAccountInCommonWith: aPortfolioEntry
