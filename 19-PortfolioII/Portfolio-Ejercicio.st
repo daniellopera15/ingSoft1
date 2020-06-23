@@ -552,6 +552,102 @@ test07AccountKnowsItsTransactions
 	self assert: (account1 transactions includes: deposit1).
 ! !
 
+
+
+!classDefinition: #ReportTest category: #'Portfolio-Ejercicio'!
+TestCase subclass: #ReportTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Ejercicio'!
+
+!ReportTest methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 21:51:01'!
+test01
+	
+	| account |
+
+	account := ReceptiveAccount new.
+	
+	self assert: (OrderedCollection with: 'Balance = 0') equals: account accountSummary.! !
+
+
+!classDefinition: #TransferTest category: #'Portfolio-Ejercicio'!
+TestCase subclass: #TransferTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Ejercicio'!
+
+!TransferTest methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 20:17:48'!
+test01
+
+	| account1 account2 |
+	
+	account1 := ReceptiveAccount new.
+	Deposit register: 1000 on: account1 .
+	
+	account2 := ReceptiveAccount new.
+	
+	Transfer register: 1000 from: account1 to: account2.
+	
+	self assert: 0 equals: account1 balance.
+	self assert: 1000 equals: account2 balance.
+! !
+
+!TransferTest methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 20:05:05'!
+test02
+
+	| account |
+	
+	account := ReceptiveAccount new.
+	Deposit register: 1000 on: account. 
+	
+	self should: [Transfer register: 1000 from: account to: account.] raise: Error withMessageText: Transfer transferToSameAccountErrorDescription
+! !
+
+!TransferTest methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 20:12:00'!
+test03
+
+	| account1 account2 |
+	
+	account1 := ReceptiveAccount new.
+	
+	account2 := ReceptiveAccount new.
+	
+	self should: [Transfer register: 1000 from: account1 to: account2.] 
+	raise: Error withMessageText: Transfer notEnoughFundsErrorDescription.
+! !
+
+!TransferTest methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 21:44:03'!
+test04
+
+	| account1 account2 |
+	
+	account1 := ReceptiveAccount new.
+	Deposit register: 1000 on: account1. 
+	
+	account2 := ReceptiveAccount new.
+	
+	self should: [Transfer register: 0 from: account1 to: account2.] 
+	raise: Error withMessageText: Transfer transferNegativeBalanceErrorDescription.
+! !
+
+!TransferTest methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 21:43:55'!
+testSEPOSTERGO
+
+	"| account1 account2 transaction |
+	
+	account1 := ReceptiveAccount new.
+	Deposit register: 1000 on: account1 .
+	
+	account2 := ReceptiveAccount new.
+	
+	transaction := Transfer register: 1000 from: account1 to: account2.
+	
+	self assert: (account1 hasRegistered: transaction).
+	self assert: (account2 hasRegistered: transaction)."
+! !
+
 
 !classDefinition: #AccountTransaction category: #'Portfolio-Ejercicio'!
 Object subclass: #AccountTransaction
@@ -577,7 +673,7 @@ applyToBalance: balance
 AccountTransaction class
 	instanceVariableNames: ''!
 
-!AccountTransaction class methodsFor: 'instance creation' stamp: 'NR 10/17/2019 03:22:00'!
+!AccountTransaction class methodsFor: 'instance creation' stamp: 'DL 6/22/2020 21:24:11'!
 register: aValue on: account
 
 	| transaction |
@@ -658,6 +754,97 @@ Withdraw class
 for: aValue
 
 	^ self new initializeFor: aValue ! !
+
+
+!classDefinition: #InTransfer category: #'Portfolio-Ejercicio'!
+Object subclass: #InTransfer
+	instanceVariableNames: 'transfer'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Ejercicio'!
+
+!InTransfer methodsFor: 'initialization' stamp: 'DL 6/22/2020 21:27:47'!
+initializeWith: aTransfer 
+	
+	transfer := aTransfer.! !
+
+!InTransfer methodsFor: 'initialization' stamp: 'DL 6/22/2020 21:31:26'!
+value
+
+	^transfer value.! !
+
+
+!InTransfer methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 21:33:54'!
+applyToBalance: balance 
+	
+	^balance + self value.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'InTransfer class' category: #'Portfolio-Ejercicio'!
+InTransfer class
+	instanceVariableNames: ''!
+
+!InTransfer class methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 21:29:32'!
+for: aTransfer 
+
+	^self new initializeWith: aTransfer.! !
+
+!InTransfer class methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 21:27:10'!
+register: aTransfer on: account 
+
+	| transaction |
+	
+	transaction := self for: aTransfer.
+	
+	account register: transaction.
+	
+	^transaction.! !
+
+
+!classDefinition: #OutTransfer category: #'Portfolio-Ejercicio'!
+Object subclass: #OutTransfer
+	instanceVariableNames: 'transfer'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Ejercicio'!
+
+!OutTransfer methodsFor: 'initialization' stamp: 'DL 6/22/2020 21:26:16'!
+initializeWith: aTransfer 
+
+	transfer := aTransfer.! !
+
+!OutTransfer methodsFor: 'initialization' stamp: 'DL 6/22/2020 21:31:17'!
+value
+
+	^transfer value.! !
+
+
+!OutTransfer methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 21:34:18'!
+applyToBalance: balance
+
+	^balance - self value.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'OutTransfer class' category: #'Portfolio-Ejercicio'!
+OutTransfer class
+	instanceVariableNames: ''!
+
+!OutTransfer class methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 21:29:25'!
+for: aTransfer 
+
+	^self new initializeWith: aTransfer.! !
+
+!OutTransfer class methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 21:25:34'!
+register: aTransfer on: account 
+
+	| transaction |
+	
+	transaction := self for: aTransfer.
+	account register: transaction.
+		
+	^ transaction! !
 
 
 !classDefinition: #PortfolioEntry category: #'Portfolio-Ejercicio'!
@@ -839,3 +1026,65 @@ isReachable: aPortfolioEntry
 
 !ReceptiveAccount methodsFor: 'adding' stamp: 'MF 6/22/2020 19:36:13'!
 addTo: aPortfolio! !
+
+
+!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 21:51:32'!
+accountSummary
+
+	^OrderedCollection with: 'Balance = 0'.! !
+
+
+!classDefinition: #Transfer category: #'Portfolio-Ejercicio'!
+Object subclass: #Transfer
+	instanceVariableNames: 'sender recipient amount'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Ejercicio'!
+
+!Transfer methodsFor: 'initialization' stamp: 'DL 6/22/2020 20:37:37'!
+initializeWith: senderAccount with: recipientAccount with: value 
+
+	sender := senderAccount.
+	recipient := recipientAccount.
+	amount := value.! !
+
+!Transfer methodsFor: 'initialization' stamp: 'DL 6/22/2020 21:33:17'!
+value
+
+	^amount.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Transfer class' category: #'Portfolio-Ejercicio'!
+Transfer class
+	instanceVariableNames: ''!
+
+!Transfer class methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 20:13:02'!
+notEnoughFundsErrorDescription
+
+	^'Not Enough funds available.'! !
+
+!Transfer class methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 21:34:56'!
+register: value from: senderAccount to: recipientAccount
+
+	| transfer |
+	senderAccount = recipientAccount  ifTrue: [self error: self transferToSameAccountErrorDescription].
+	value <= 0 ifTrue: [self error: self transferNegativeBalanceErrorDescription].
+	senderAccount balance < value ifTrue: [self error: self notEnoughFundsErrorDescription].
+	
+	transfer := self new initializeWith: senderAccount with: recipientAccount with: value.
+	
+	OutTransfer register: transfer on: senderAccount.
+	InTransfer register: transfer on: recipientAccount.
+	
+	^transfer.! !
+
+!Transfer class methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 20:54:58'!
+transferNegativeBalanceErrorDescription
+	
+	^'Cannot transfer negative balance'.! !
+
+!Transfer class methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 20:01:50'!
+transferToSameAccountErrorDescription
+
+	^'Cannot transfer to same account'.! !
