@@ -552,7 +552,6 @@ test07AccountKnowsItsTransactions
 	self assert: (account1 transactions includes: deposit1).
 ! !
 
-
 
 !classDefinition: #ReportTest category: #'Portfolio-Ejercicio'!
 TestCase subclass: #ReportTest
@@ -569,6 +568,43 @@ test01
 	account := ReceptiveAccount new.
 	
 	self assert: (OrderedCollection with: 'Balance = 0') equals: account accountSummary.! !
+
+!ReportTest methodsFor: 'as yet unclassified' stamp: 'MF 6/25/2020 16:44:06'!
+test02
+	
+	| account |
+
+	account := ReceptiveAccount new.
+	Deposit register: 100 on: account.
+	Withdraw register: 50 on: account.
+		
+	self assert: (OrderedCollection withAll: #('Depósito por 100.' 'Extracción por 50.' 'Balance = 50')) equals: account accountSummary.! !
+
+!ReportTest methodsFor: 'as yet unclassified' stamp: 'MF 6/25/2020 16:46:44'!
+test03
+	
+	| account |
+
+	account := ReceptiveAccount new.
+	Deposit register: 100 on: account.
+	Withdraw register: 50 on: account.
+	Deposit register: 25 on: account.
+	Withdraw register: 5 on: account.
+		
+	self assert: (OrderedCollection withAll: #('Depósito por 100.' 'Extracción por 50.' 'Depósito por 25.' 'Extracción por 5.' 'Balance = 70')) equals: account accountSummary.! !
+
+!ReportTest methodsFor: 'as yet unclassified' stamp: 'MF 6/25/2020 16:54:34'!
+test04
+	
+	| account account2 |
+	
+	account := ReceptiveAccount new.
+	account2 := ReceptiveAccount new.
+	Deposit register: 20 on: account. 
+	Transfer register: 20 from: account to: account2. 
+		
+	self assert: (OrderedCollection withAll: #('Depósito por 20.' 'Salida por transferencia de 20.' 'Balance = 0')) equals: account accountSummary.
+	self assert: (OrderedCollection withAll: #('Entrada por transferencia de 20.' 'Balance = 20')) equals: account2 accountSummary. ! !
 
 
 !classDefinition: #TransferTest category: #'Portfolio-Ejercicio'!
@@ -632,6 +668,25 @@ test04
 	raise: Error withMessageText: Transfer transferNegativeBalanceErrorDescription.
 ! !
 
+!TransferTest methodsFor: 'as yet unclassified' stamp: 'MF 6/25/2020 16:22:51'!
+test05
+
+	| account1 account2 inTransfer outTransfer transfer |
+	
+	account1 := ReceptiveAccount new.
+	Deposit register: 1000 on: account1. 
+	
+	account2 := ReceptiveAccount new.
+	
+	transfer := Transfer register: 1000 from: account1 to: account2.
+	inTransfer := transfer inTransfer.
+	outTransfer := transfer outTransfer.
+	
+	self assert: transfer equals: inTransfer transfer. 
+	self assert: transfer equals: outTransfer transfer. 
+	self assert: outTransfer equals: inTransfer transfer outTransfer. 
+	self assert: inTransfer equals: outTransfer transfer inTransfer. ! !
+
 !TransferTest methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 21:43:55'!
 testSEPOSTERGO
 
@@ -647,6 +702,207 @@ testSEPOSTERGO
 	self assert: (account1 hasRegistered: transaction).
 	self assert: (account2 hasRegistered: transaction)."
 ! !
+
+
+!classDefinition: #Account category: #'Portfolio-Ejercicio'!
+Object subclass: #Account
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Ejercicio'!
+
+!Account methodsFor: 'testing' stamp: 'DL 6/21/2020 18:31:45'!
+hasRegistered
+	
+	^self subclassResponsibility! !
+
+
+!Account methodsFor: 'balance' stamp: 'DL 6/21/2020 18:31:17'!
+balance
+	
+	^self subclassResponsibility! !
+
+
+!Account methodsFor: 'transactions' stamp: 'DL 6/21/2020 18:32:00'!
+transactions
+	
+	^self subclassResponsibility! !
+
+
+!Account methodsFor: 'private' stamp: 'MF 6/22/2020 19:36:13'!
+addTo: aPortfolio
+	
+	^self subclassResponsibility! !
+
+!Account methodsFor: 'private' stamp: 'DL 6/21/2020 18:42:07'!
+hasAccountInCommonWith: aPortfolioEntry
+	
+	^self subclassResponsibility! !
+
+!Account methodsFor: 'private' stamp: 'DL 6/21/2020 18:32:15'!
+isReachable: aPortfolioEntry
+	
+	^self subclassResponsibility! !
+
+
+!classDefinition: #Portfolio category: #'Portfolio-Ejercicio'!
+Account subclass: #Portfolio
+	instanceVariableNames: 'entries parents'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Ejercicio'!
+
+!Portfolio methodsFor: 'balance' stamp: 'MF 6/20/2020 18:05:21'!
+balance
+	^(entries sum: [:account | account balance] ifEmpty: [0])! !
+
+
+!Portfolio methodsFor: 'testing' stamp: 'MF 6/20/2020 18:05:36'!
+hasRegistered: aTransaction
+	^(entries anySatisfy: [:anAccount | anAccount hasRegistered: aTransaction]).! !
+
+
+!Portfolio methodsFor: 'transactions' stamp: 'DL 6/21/2020 19:20:22'!
+transactions
+	^(entries inject: OrderedCollection new into: [:acc :account | acc , account transactions])
+
+! !
+
+
+!Portfolio methodsFor: 'signals' stamp: 'MF 6/20/2020 18:15:17'!
+signalTreeStructureBroken
+
+	^ self error: self class cantBreakTreeStructureErrorDescription! !
+
+
+!Portfolio methodsFor: 'initialization' stamp: 'MF 6/20/2020 20:15:18'!
+initialize
+	entries := OrderedCollection new.
+	parents := OrderedCollection new.
+! !
+
+
+!Portfolio methodsFor: 'adding' stamp: 'MF 6/22/2020 19:36:13'!
+add: aPortfolioEntry 
+	
+	self validateTreeStructureNotBrokenWhenAdding: aPortfolioEntry.
+	
+	entries add: aPortfolioEntry.
+	
+	"Se dejo este if. Pensamos que si aplicabamos el algoritmo para sacar ifs, y colocábamos el addOwner en PortfolioEntry y ReceptiveAccount no hiciera nada, podía hacer confusa la escencia de ese objeto."
+	
+	(aPortfolioEntry isKindOf: self class) ifTrue: [ aPortfolioEntry addTo: self ].! !
+
+
+!Portfolio methodsFor: 'private' stamp: 'MF 6/22/2020 19:36:13'!
+addTo: aPortfolio 
+	parents add: aPortfolio.! !
+
+!Portfolio methodsFor: 'private' stamp: 'MF 6/20/2020 19:28:38'!
+hasAccountInCommonWith: aPortfolioEntry
+	^(aPortfolioEntry isReachable: self) or: [entries anySatisfy: [:entry | entry hasAccountInCommonWith: aPortfolioEntry]]! !
+
+!Portfolio methodsFor: 'private' stamp: 'MF 6/20/2020 21:04:23'!
+hasAnyRootPortfolioAccountInCommonWith: aPortfolioEntry 
+	
+	self isRootPortfolio ifTrue: [^self hasAccountInCommonWith: aPortfolioEntry].
+	^parents anySatisfy: [:parent | (parent hasAnyRootPortfolioAccountInCommonWith: aPortfolioEntry)].
+	! !
+
+!Portfolio methodsFor: 'private' stamp: 'MF 6/20/2020 18:37:55'!
+isReachable: aPortfolioEntry
+	^(aPortfolioEntry = self) or: [entries anySatisfy: [:entry | entry isReachable: aPortfolioEntry]]! !
+
+!Portfolio methodsFor: 'private' stamp: 'MF 6/20/2020 21:04:23'!
+isRootPortfolio
+
+	^ parents isEmpty! !
+
+!Portfolio methodsFor: 'private' stamp: 'DL 6/21/2020 19:07:19'!
+validateTreeStructureNotBrokenWhenAdding: aPortfolioEntry
+
+	^ (self hasAnyRootPortfolioAccountInCommonWith: aPortfolioEntry) ifTrue: [self signalTreeStructureBroken]! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Portfolio class' category: #'Portfolio-Ejercicio'!
+Portfolio class
+	instanceVariableNames: ''!
+
+!Portfolio class methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 18:13:02'!
+cantBreakTreeStructureErrorDescription
+	^'cannot create cyclic references to accounts nor Portfolios'! !
+
+
+!classDefinition: #ReceptiveAccount category: #'Portfolio-Ejercicio'!
+Account subclass: #ReceptiveAccount
+	instanceVariableNames: 'transactions'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Ejercicio'!
+
+!ReceptiveAccount methodsFor: 'initialization' stamp: 'DL 6/21/2020 18:53:36'!
+initialize
+
+	transactions := OrderedCollection new.! !
+
+
+!ReceptiveAccount methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 18:37'!
+register: aTransaction
+
+	transactions add: aTransaction 
+! !
+
+!ReceptiveAccount methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 18:37'!
+transactions 
+
+	^ transactions copy! !
+
+
+!ReceptiveAccount methodsFor: 'balance' stamp: 'DL 6/21/2020 18:23:58'!
+balance
+
+	^transactions inject: 0 into: [:balance :aTransaction | aTransaction applyToBalance: balance]. ! !
+
+
+!ReceptiveAccount methodsFor: 'testing' stamp: 'NR 10/17/2019 03:28:43'!
+hasRegistered: aTransaction
+
+	^ transactions includes: aTransaction 
+! !
+
+
+!ReceptiveAccount methodsFor: 'private' stamp: 'MF 6/20/2020 19:29:05'!
+hasAccountInCommonWith: aPortfolioEntry
+	^aPortfolioEntry isReachable: self! !
+
+!ReceptiveAccount methodsFor: 'private' stamp: 'MF 6/20/2020 18:38:56'!
+isReachable: aPortfolioEntry
+	^aPortfolioEntry = self! !
+
+
+!ReceptiveAccount methodsFor: 'adding' stamp: 'MF 6/22/2020 19:36:13'!
+addTo: aPortfolio! !
+
+
+!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'MF 6/25/2020 16:56:13'!
+accountSummary
+
+	| transactionsSummary |
+	
+	transactionsSummary := transactions collect: [:transaction | 
+		(transaction isKindOf: Deposit) 
+			ifTrue: ['Depósito por ', transaction value asString, '.'] 
+			ifFalse: [ (transaction isKindOf: Withdraw)
+					ifTrue: ['Extracción por ', transaction value asString, '.']
+					ifFalse: [ (transaction isKindOf: OutTransfer)
+							ifTrue: ['Salida por transferencia de ', transaction value asString, '.']
+							ifFalse: ['Entrada por transferencia de ', transaction value asString, '.']
+						]
+				]
+		].
+	transactionsSummary add: ('Balance = ', self balance asString).
+	^transactionsSummary ! !
 
 
 !classDefinition: #AccountTransaction category: #'Portfolio-Ejercicio'!
@@ -779,6 +1035,10 @@ applyToBalance: balance
 	
 	^balance + self value.! !
 
+!InTransfer methodsFor: 'as yet unclassified' stamp: 'MF 6/25/2020 16:29:58'!
+transfer
+	^transfer! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'InTransfer class' category: #'Portfolio-Ejercicio'!
@@ -825,6 +1085,10 @@ applyToBalance: balance
 
 	^balance - self value.! !
 
+!OutTransfer methodsFor: 'as yet unclassified' stamp: 'MF 6/25/2020 16:30:11'!
+transfer
+	^transfer! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'OutTransfer class' category: #'Portfolio-Ejercicio'!
@@ -847,211 +1111,39 @@ register: aTransfer on: account
 	^ transaction! !
 
 
-!classDefinition: #PortfolioEntry category: #'Portfolio-Ejercicio'!
-Object subclass: #PortfolioEntry
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Portfolio-Ejercicio'!
-
-!PortfolioEntry methodsFor: 'testing' stamp: 'DL 6/21/2020 18:31:45'!
-hasRegistered
-	
-	^self subclassResponsibility! !
-
-
-!PortfolioEntry methodsFor: 'balance' stamp: 'DL 6/21/2020 18:31:17'!
-balance
-	
-	^self subclassResponsibility! !
-
-
-!PortfolioEntry methodsFor: 'transactions' stamp: 'DL 6/21/2020 18:32:00'!
-transactions
-	
-	^self subclassResponsibility! !
-
-
-!PortfolioEntry methodsFor: 'private' stamp: 'MF 6/22/2020 19:36:13'!
-addTo: aPortfolio
-	
-	^self subclassResponsibility! !
-
-!PortfolioEntry methodsFor: 'private' stamp: 'DL 6/21/2020 18:42:07'!
-hasAccountInCommonWith: aPortfolioEntry
-	
-	^self subclassResponsibility! !
-
-!PortfolioEntry methodsFor: 'private' stamp: 'DL 6/21/2020 18:32:15'!
-isReachable: aPortfolioEntry
-	
-	^self subclassResponsibility! !
-
-
-!classDefinition: #Portfolio category: #'Portfolio-Ejercicio'!
-PortfolioEntry subclass: #Portfolio
-	instanceVariableNames: 'entries parents'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Portfolio-Ejercicio'!
-
-!Portfolio methodsFor: 'balance' stamp: 'MF 6/20/2020 18:05:21'!
-balance
-	^(entries sum: [:account | account balance] ifEmpty: [0])! !
-
-
-!Portfolio methodsFor: 'testing' stamp: 'MF 6/20/2020 18:05:36'!
-hasRegistered: aTransaction
-	^(entries anySatisfy: [:anAccount | anAccount hasRegistered: aTransaction]).! !
-
-
-!Portfolio methodsFor: 'transactions' stamp: 'DL 6/21/2020 19:20:22'!
-transactions
-	^(entries inject: OrderedCollection new into: [:acc :account | acc , account transactions])
-
-! !
-
-
-!Portfolio methodsFor: 'signals' stamp: 'MF 6/20/2020 18:15:17'!
-signalTreeStructureBroken
-
-	^ self error: self class cantBreakTreeStructureErrorDescription! !
-
-
-!Portfolio methodsFor: 'initialization' stamp: 'MF 6/20/2020 20:15:18'!
-initialize
-	entries := OrderedCollection new.
-	parents := OrderedCollection new.
-! !
-
-
-!Portfolio methodsFor: 'adding' stamp: 'MF 6/22/2020 19:36:13'!
-add: aPortfolioEntry 
-	
-	self validateTreeStructureNotBrokenWhenAdding: aPortfolioEntry.
-	
-	entries add: aPortfolioEntry.
-	
-	"Se dejo este if. Pensamos que si aplicabamos el algoritmo para sacar ifs, y colocábamos el addOwner en PortfolioEntry y ReceptiveAccount no hiciera nada, podía hacer confusa la escencia de ese objeto."
-	
-	(aPortfolioEntry isKindOf: self class) ifTrue: [ aPortfolioEntry addTo: self ].! !
-
-
-!Portfolio methodsFor: 'private' stamp: 'MF 6/22/2020 19:36:13'!
-addTo: aPortfolio 
-	parents add: aPortfolio.! !
-
-!Portfolio methodsFor: 'private' stamp: 'MF 6/20/2020 19:28:38'!
-hasAccountInCommonWith: aPortfolioEntry
-	^(aPortfolioEntry isReachable: self) or: [entries anySatisfy: [:entry | entry hasAccountInCommonWith: aPortfolioEntry]]! !
-
-!Portfolio methodsFor: 'private' stamp: 'MF 6/20/2020 21:04:23'!
-hasAnyRootPortfolioAccountInCommonWith: aPortfolioEntry 
-	
-	self isRootPortfolio ifTrue: [^self hasAccountInCommonWith: aPortfolioEntry].
-	^parents anySatisfy: [:parent | (parent hasAnyRootPortfolioAccountInCommonWith: aPortfolioEntry)].
-	! !
-
-!Portfolio methodsFor: 'private' stamp: 'MF 6/20/2020 18:37:55'!
-isReachable: aPortfolioEntry
-	^(aPortfolioEntry = self) or: [entries anySatisfy: [:entry | entry isReachable: aPortfolioEntry]]! !
-
-!Portfolio methodsFor: 'private' stamp: 'MF 6/20/2020 21:04:23'!
-isRootPortfolio
-
-	^ parents isEmpty! !
-
-!Portfolio methodsFor: 'private' stamp: 'DL 6/21/2020 19:07:19'!
-validateTreeStructureNotBrokenWhenAdding: aPortfolioEntry
-
-	^ (self hasAnyRootPortfolioAccountInCommonWith: aPortfolioEntry) ifTrue: [self signalTreeStructureBroken]! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'Portfolio class' category: #'Portfolio-Ejercicio'!
-Portfolio class
-	instanceVariableNames: ''!
-
-!Portfolio class methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 18:13:02'!
-cantBreakTreeStructureErrorDescription
-	^'cannot create cyclic references to accounts nor Portfolios'! !
-
-
-!classDefinition: #ReceptiveAccount category: #'Portfolio-Ejercicio'!
-PortfolioEntry subclass: #ReceptiveAccount
-	instanceVariableNames: 'transactions'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Portfolio-Ejercicio'!
-
-!ReceptiveAccount methodsFor: 'initialization' stamp: 'DL 6/21/2020 18:53:36'!
-initialize
-
-	transactions := OrderedCollection new.! !
-
-
-!ReceptiveAccount methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 18:37'!
-register: aTransaction
-
-	transactions add: aTransaction 
-! !
-
-!ReceptiveAccount methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 18:37'!
-transactions 
-
-	^ transactions copy! !
-
-
-!ReceptiveAccount methodsFor: 'balance' stamp: 'DL 6/21/2020 18:23:58'!
-balance
-
-	^transactions inject: 0 into: [:balance :aTransaction | aTransaction applyToBalance: balance]. ! !
-
-
-!ReceptiveAccount methodsFor: 'testing' stamp: 'NR 10/17/2019 03:28:43'!
-hasRegistered: aTransaction
-
-	^ transactions includes: aTransaction 
-! !
-
-
-!ReceptiveAccount methodsFor: 'private' stamp: 'MF 6/20/2020 19:29:05'!
-hasAccountInCommonWith: aPortfolioEntry
-	^aPortfolioEntry isReachable: self! !
-
-!ReceptiveAccount methodsFor: 'private' stamp: 'MF 6/20/2020 18:38:56'!
-isReachable: aPortfolioEntry
-	^aPortfolioEntry = self! !
-
-
-!ReceptiveAccount methodsFor: 'adding' stamp: 'MF 6/22/2020 19:36:13'!
-addTo: aPortfolio! !
-
-
-!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 21:51:32'!
-accountSummary
-
-	^OrderedCollection with: 'Balance = 0'.! !
-
-
 !classDefinition: #Transfer category: #'Portfolio-Ejercicio'!
 Object subclass: #Transfer
-	instanceVariableNames: 'sender recipient amount'
+	instanceVariableNames: 'amount inTransfer outTransfer'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
 
-!Transfer methodsFor: 'initialization' stamp: 'DL 6/22/2020 20:37:37'!
-initializeWith: senderAccount with: recipientAccount with: value 
+!Transfer methodsFor: 'initialization' stamp: 'MF 6/25/2020 16:28:55'!
+initializeWith: value 
 
-	sender := senderAccount.
-	recipient := recipientAccount.
 	amount := value.! !
 
 !Transfer methodsFor: 'initialization' stamp: 'DL 6/22/2020 21:33:17'!
 value
 
 	^amount.! !
+
+
+!Transfer methodsFor: 'as yet unclassified' stamp: 'MF 6/25/2020 16:23:31'!
+inTransfer
+	^inTransfer! !
+
+!Transfer methodsFor: 'as yet unclassified' stamp: 'MF 6/25/2020 16:29:41'!
+inTransfer: anInTransfer 
+	inTransfer _ anInTransfer! !
+
+!Transfer methodsFor: 'as yet unclassified' stamp: 'MF 6/25/2020 16:24:10'!
+outTransfer
+	^outTransfer! !
+
+!Transfer methodsFor: 'as yet unclassified' stamp: 'MF 6/25/2020 16:29:31'!
+outTransfer: anOutTransfer 
+	outTransfer _ anOutTransfer! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1064,18 +1156,21 @@ notEnoughFundsErrorDescription
 
 	^'Not Enough funds available.'! !
 
-!Transfer class methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 21:34:56'!
+!Transfer class methodsFor: 'as yet unclassified' stamp: 'MF 6/25/2020 16:28:21'!
 register: value from: senderAccount to: recipientAccount
 
-	| transfer |
+	| transfer inTransfer outTransfer |
 	senderAccount = recipientAccount  ifTrue: [self error: self transferToSameAccountErrorDescription].
 	value <= 0 ifTrue: [self error: self transferNegativeBalanceErrorDescription].
 	senderAccount balance < value ifTrue: [self error: self notEnoughFundsErrorDescription].
 	
-	transfer := self new initializeWith: senderAccount with: recipientAccount with: value.
+	transfer := self new initializeWith: value.
 	
-	OutTransfer register: transfer on: senderAccount.
-	InTransfer register: transfer on: recipientAccount.
+	outTransfer := OutTransfer register: transfer on: senderAccount.
+	inTransfer := InTransfer register: transfer on: recipientAccount.
+	
+	transfer outTransfer: outTransfer.
+	transfer inTransfer: inTransfer.
 	
 	^transfer.! !
 
