@@ -552,6 +552,7 @@ test07AccountKnowsItsTransactions
 	self assert: (account1 transactions includes: deposit1).
 ! !
 
+
 
 !classDefinition: #ReportTest category: #'Portfolio-Ejercicio'!
 TestCase subclass: #ReportTest
@@ -560,7 +561,44 @@ TestCase subclass: #ReportTest
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
 
-!ReportTest methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 21:51:01'!
+!ReportTest methodsFor: 'transfer net' stamp: 'DL 6/25/2020 21:13:25'!
+test08
+	
+	| account |
+
+	account := ReceptiveAccount new.
+	
+	self assert: 0 equals: account transferNet.! !
+
+!ReportTest methodsFor: 'transfer net' stamp: 'DL 6/25/2020 21:24:37'!
+test09
+	
+	| account account2 |
+	
+	account := ReceptiveAccount new.
+	account2 := ReceptiveAccount new.
+	Deposit register: 20 on: account. 
+	Transfer register: 20 from: account to: account2. 
+		
+	self assert: -20 equals: account transferNet.
+	self assert: 20 equals: account2 transferNet.! !
+
+!ReportTest methodsFor: 'transfer net' stamp: 'DL 6/25/2020 21:26:58'!
+test10
+	
+	| account account2 |
+	
+	account := ReceptiveAccount new.
+	account2 := ReceptiveAccount new.
+	Deposit register: 20 on: account. 
+	Transfer register: 20 from: account to: account2.
+	Transfer register: 10 from: account2 to: account.
+	
+	self assert: -10 equals: account transferNet.
+	self assert: 10 equals: account2 transferNet.! !
+
+
+!ReportTest methodsFor: 'summary' stamp: 'DL 6/25/2020 20:15:30'!
 test01
 	
 	| account |
@@ -569,19 +607,28 @@ test01
 	
 	self assert: (OrderedCollection with: 'Balance = 0') equals: account accountSummary.! !
 
-!ReportTest methodsFor: 'as yet unclassified' stamp: 'MF 6/25/2020 16:44:06'!
+!ReportTest methodsFor: 'summary' stamp: 'DL 6/25/2020 20:19:13'!
 test02
 	
 	| account |
 
 	account := ReceptiveAccount new.
-	Deposit register: 100 on: account.
 	Withdraw register: 50 on: account.
 		
-	self assert: (OrderedCollection withAll: #('Depósito por 100.' 'Extracción por 50.' 'Balance = 50')) equals: account accountSummary.! !
+	self assert: (OrderedCollection withAll: #('Extracción por 50.' 'Balance = -50')) equals: account accountSummary.! !
 
-!ReportTest methodsFor: 'as yet unclassified' stamp: 'MF 6/25/2020 16:46:44'!
+!ReportTest methodsFor: 'summary' stamp: 'DL 6/25/2020 20:19:55'!
 test03
+	
+	| account |
+
+	account := ReceptiveAccount new.
+	Deposit register: 100 on: account.
+		
+	self assert: (OrderedCollection withAll: #('Depósito por 100.' 'Balance = 100')) equals: account accountSummary.! !
+
+!ReportTest methodsFor: 'summary' stamp: 'DL 6/25/2020 20:19:51'!
+test04
 	
 	| account |
 
@@ -593,8 +640,8 @@ test03
 		
 	self assert: (OrderedCollection withAll: #('Depósito por 100.' 'Extracción por 50.' 'Depósito por 25.' 'Extracción por 5.' 'Balance = 70')) equals: account accountSummary.! !
 
-!ReportTest methodsFor: 'as yet unclassified' stamp: 'MF 6/25/2020 16:54:34'!
-test04
+!ReportTest methodsFor: 'summary' stamp: 'DL 6/25/2020 20:19:45'!
+test05
 	
 	| account account2 |
 	
@@ -605,6 +652,37 @@ test04
 		
 	self assert: (OrderedCollection withAll: #('Depósito por 20.' 'Salida por transferencia de 20.' 'Balance = 0')) equals: account accountSummary.
 	self assert: (OrderedCollection withAll: #('Entrada por transferencia de 20.' 'Balance = 20')) equals: account2 accountSummary. ! !
+
+!ReportTest methodsFor: 'summary' stamp: 'DL 6/25/2020 21:00:06'!
+test06
+	
+	| portfolio |
+	
+	portfolio := Portfolio new.
+		
+	self assert: (OrderedCollection withAll: #('Balance = 0')) equals: portfolio accountSummary.! !
+
+!ReportTest methodsFor: 'summary' stamp: 'DL 6/25/2020 21:05:08'!
+test07
+	
+	| account account2 portfolio |
+	
+	account := ReceptiveAccount new.
+	account2 := ReceptiveAccount new.
+	Deposit register: 20 on: account. 
+	Transfer register: 20 from: account to: account2. 
+	Withdraw register: 10 on: account2.
+	
+	portfolio := Portfolio new.
+	portfolio add: account.
+	portfolio add: account2. 
+	
+	self assert: (OrderedCollection withAll: 
+	#('Depósito por 20.' 
+	'Salida por transferencia de 20.' 
+	'Entrada por transferencia de 20.'
+	'Extracción por 10.' 
+	'Balance = 10')) equals: portfolio accountSummary.! !
 
 
 !classDefinition: #TransferTest category: #'Portfolio-Ejercicio'!
@@ -687,7 +765,7 @@ test05
 	self assert: outTransfer equals: inTransfer transfer outTransfer. 
 	self assert: inTransfer equals: outTransfer transfer inTransfer. ! !
 
-!TransferTest methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 21:43:55'!
+!TransferTest methodsFor: 'as yet unclassified' stamp: 'DL 6/25/2020 20:43:21'!
 testSEPOSTERGO
 
 	"| account1 account2 transaction |
@@ -716,6 +794,10 @@ hasRegistered
 	
 	^self subclassResponsibility! !
 
+
+!Account methodsFor: 'balance' stamp: 'DL 6/25/2020 21:07:47'!
+accountSummary
+	^(SummaryReport account: self) compute! !
 
 !Account methodsFor: 'balance' stamp: 'DL 6/21/2020 18:31:17'!
 balance
@@ -823,6 +905,7 @@ validateTreeStructureNotBrokenWhenAdding: aPortfolioEntry
 
 	^ (self hasAnyRootPortfolioAccountInCommonWith: aPortfolioEntry) ifTrue: [self signalTreeStructureBroken]! !
 
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Portfolio class' category: #'Portfolio-Ejercicio'!
@@ -885,24 +968,10 @@ isReachable: aPortfolioEntry
 addTo: aPortfolio! !
 
 
-!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'MF 6/25/2020 16:56:13'!
-accountSummary
+!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'DL 6/25/2020 21:39:31'!
+transferNet
 
-	| transactionsSummary |
-	
-	transactionsSummary := transactions collect: [:transaction | 
-		(transaction isKindOf: Deposit) 
-			ifTrue: ['Depósito por ', transaction value asString, '.'] 
-			ifFalse: [ (transaction isKindOf: Withdraw)
-					ifTrue: ['Extracción por ', transaction value asString, '.']
-					ifFalse: [ (transaction isKindOf: OutTransfer)
-							ifTrue: ['Salida por transferencia de ', transaction value asString, '.']
-							ifFalse: ['Entrada por transferencia de ', transaction value asString, '.']
-						]
-				]
-		].
-	transactionsSummary add: ('Balance = ', self balance asString).
-	^transactionsSummary ! !
+	^transactions sum: [ :transaction | transaction transferNetReport] ifEmpty: [0].! !
 
 
 !classDefinition: #AccountTransaction category: #'Portfolio-Ejercicio'!
@@ -923,13 +992,23 @@ applyToBalance: balance
 
 	^self subclassResponsibility.! !
 
+!AccountTransaction methodsFor: 'balance operation' stamp: 'DL 6/25/2020 20:22:02'!
+summaryString
+
+ 	^self subclassResponsibility.! !
+
+!AccountTransaction methodsFor: 'balance operation' stamp: 'DL 6/25/2020 21:38:46'!
+transferNetReport
+
+ 	^self subclassResponsibility.! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'AccountTransaction class' category: #'Portfolio-Ejercicio'!
 AccountTransaction class
 	instanceVariableNames: ''!
 
-!AccountTransaction class methodsFor: 'instance creation' stamp: 'DL 6/22/2020 21:24:11'!
+!AccountTransaction class methodsFor: 'instance creation' stamp: 'DL 6/25/2020 20:35:23'!
 register: aValue on: account
 
 	| transaction |
@@ -964,6 +1043,16 @@ applyToBalance: balance
 
 	^ balance + self value.! !
 
+!Deposit methodsFor: 'balance operation' stamp: 'DL 6/25/2020 20:22:50'!
+summaryString
+
+	^'Depósito por ', self value asString, '.'! !
+
+!Deposit methodsFor: 'balance operation' stamp: 'DL 6/25/2020 21:36:16'!
+transferNetReport
+
+	^0.! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Deposit class' category: #'Portfolio-Ejercicio'!
@@ -974,6 +1063,108 @@ Deposit class
 for: aValue
 
 	^ self new initializeFor: aValue ! !
+
+
+!classDefinition: #TransferLeg category: #'Portfolio-Ejercicio'!
+AccountTransaction subclass: #TransferLeg
+	instanceVariableNames: 'transfer'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Ejercicio'!
+
+!TransferLeg methodsFor: 'as yet unclassified' stamp: 'DL 6/25/2020 20:28:29'!
+applyToBalance: balance
+
+ 	^self subclassResponsibility.! !
+
+!TransferLeg methodsFor: 'as yet unclassified' stamp: 'DL 6/25/2020 20:29:33'!
+summaryString
+
+	^self subclassResponsibility.! !
+
+!TransferLeg methodsFor: 'as yet unclassified' stamp: 'DL 6/25/2020 20:29:01'!
+transfer
+
+	^transfer.! !
+
+!TransferLeg methodsFor: 'as yet unclassified' stamp: 'DL 6/25/2020 21:30:52'!
+transferNetReport
+
+ 	^self subclassResponsibility.! !
+
+!TransferLeg methodsFor: 'as yet unclassified' stamp: 'DL 6/25/2020 20:34:48'!
+value
+
+	^transfer value.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'TransferLeg class' category: #'Portfolio-Ejercicio'!
+TransferLeg class
+	instanceVariableNames: ''!
+
+!TransferLeg class methodsFor: 'as yet unclassified' stamp: 'DL 6/25/2020 20:30:17'!
+for: aTransfer 
+
+	^self new initializeWith: aTransfer.! !
+
+
+!classDefinition: #InTransfer category: #'Portfolio-Ejercicio'!
+TransferLeg subclass: #InTransfer
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Ejercicio'!
+
+!InTransfer methodsFor: 'initialization' stamp: 'DL 6/22/2020 21:27:47'!
+initializeWith: aTransfer 
+	
+	transfer := aTransfer.! !
+
+
+!InTransfer methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 21:33:54'!
+applyToBalance: balance 
+	
+	^balance + self value.! !
+
+!InTransfer methodsFor: 'as yet unclassified' stamp: 'DL 6/25/2020 20:24:31'!
+summaryString
+
+	^'Entrada por transferencia de ', self value asString, '.'! !
+
+!InTransfer methodsFor: 'as yet unclassified' stamp: 'DL 6/25/2020 21:31:34'!
+transferNetReport
+
+	^self value.! !
+
+
+!classDefinition: #OutTransfer category: #'Portfolio-Ejercicio'!
+TransferLeg subclass: #OutTransfer
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Ejercicio'!
+
+!OutTransfer methodsFor: 'initialization' stamp: 'DL 6/22/2020 21:26:16'!
+initializeWith: aTransfer 
+
+	transfer := aTransfer.! !
+
+
+!OutTransfer methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 21:34:18'!
+applyToBalance: balance
+
+	^balance - self value.! !
+
+!OutTransfer methodsFor: 'as yet unclassified' stamp: 'DL 6/25/2020 20:24:08'!
+summaryString
+
+	^'Salida por transferencia de ', self value asString, '.'! !
+
+!OutTransfer methodsFor: 'as yet unclassified' stamp: 'DL 6/25/2020 21:31:51'!
+transferNetReport
+
+	^self value negated.! !
 
 
 !classDefinition: #Withdraw category: #'Portfolio-Ejercicio'!
@@ -1000,6 +1191,16 @@ applyToBalance: balance
 
 	^ balance - self value.! !
 
+!Withdraw methodsFor: 'balance operation' stamp: 'DL 6/25/2020 20:23:30'!
+summaryString
+
+	^'Extracción por ', self value asString, '.'.! !
+
+!Withdraw methodsFor: 'balance operation' stamp: 'DL 6/25/2020 21:36:35'!
+transferNetReport
+
+	^0.! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Withdraw class' category: #'Portfolio-Ejercicio'!
@@ -1012,103 +1213,85 @@ for: aValue
 	^ self new initializeFor: aValue ! !
 
 
-!classDefinition: #InTransfer category: #'Portfolio-Ejercicio'!
-Object subclass: #InTransfer
-	instanceVariableNames: 'transfer'
+!classDefinition: #PortfolioEntry category: #'Portfolio-Ejercicio'!
+Object subclass: #PortfolioEntry
+	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
 
-!InTransfer methodsFor: 'initialization' stamp: 'DL 6/22/2020 21:27:47'!
-initializeWith: aTransfer 
+!PortfolioEntry methodsFor: 'testing' stamp: 'DL 6/21/2020 18:31:45'!
+hasRegistered
 	
-	transfer := aTransfer.! !
-
-!InTransfer methodsFor: 'initialization' stamp: 'DL 6/22/2020 21:31:26'!
-value
-
-	^transfer value.! !
+	^self subclassResponsibility! !
 
 
-!InTransfer methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 21:33:54'!
-applyToBalance: balance 
+!PortfolioEntry methodsFor: 'balance' stamp: 'DL 6/21/2020 18:31:17'!
+balance
 	
-	^balance + self value.! !
+	^self subclassResponsibility! !
 
-!InTransfer methodsFor: 'as yet unclassified' stamp: 'MF 6/25/2020 16:29:58'!
-transfer
-	^transfer! !
 
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'InTransfer class' category: #'Portfolio-Ejercicio'!
-InTransfer class
-	instanceVariableNames: ''!
-
-!InTransfer class methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 21:29:32'!
-for: aTransfer 
-
-	^self new initializeWith: aTransfer.! !
-
-!InTransfer class methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 21:27:10'!
-register: aTransfer on: account 
-
-	| transaction |
+!PortfolioEntry methodsFor: 'transactions' stamp: 'DL 6/21/2020 18:32:00'!
+transactions
 	
-	transaction := self for: aTransfer.
+	^self subclassResponsibility! !
+
+
+!PortfolioEntry methodsFor: 'private' stamp: 'MF 6/22/2020 19:36:13'!
+addTo: aPortfolio
 	
-	account register: transaction.
+	^self subclassResponsibility! !
+
+!PortfolioEntry methodsFor: 'private' stamp: 'DL 6/21/2020 18:42:07'!
+hasAccountInCommonWith: aPortfolioEntry
 	
-	^transaction.! !
+	^self subclassResponsibility! !
+
+!PortfolioEntry methodsFor: 'private' stamp: 'DL 6/21/2020 18:32:15'!
+isReachable: aPortfolioEntry
+	
+	^self subclassResponsibility! !
 
 
-!classDefinition: #OutTransfer category: #'Portfolio-Ejercicio'!
-Object subclass: #OutTransfer
-	instanceVariableNames: 'transfer'
+!classDefinition: #SummaryReport category: #'Portfolio-Ejercicio'!
+Object subclass: #SummaryReport
+	instanceVariableNames: 'transactions account'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
 
-!OutTransfer methodsFor: 'initialization' stamp: 'DL 6/22/2020 21:26:16'!
-initializeWith: aTransfer 
+!SummaryReport methodsFor: 'initialization' stamp: 'DL 6/25/2020 20:53:03'!
+initializeWithAccount: anAccount
 
-	transfer := aTransfer.! !
-
-!OutTransfer methodsFor: 'initialization' stamp: 'DL 6/22/2020 21:31:17'!
-value
-
-	^transfer value.! !
+	account := anAccount.
+	transactions := anAccount transactions.
+! !
 
 
-!OutTransfer methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 21:34:18'!
-applyToBalance: balance
+!SummaryReport methodsFor: 'evaluating' stamp: 'DL 6/25/2020 20:53:27'!
+compute
 
-	^balance - self value.! !
-
-!OutTransfer methodsFor: 'as yet unclassified' stamp: 'MF 6/25/2020 16:30:11'!
-transfer
-	^transfer! !
+	| summary |
+	
+	summary := transactions collect: [:transaction | transaction summaryString].
+	summary add: ('Balance = ', account balance asString).
+	
+	^summary ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'OutTransfer class' category: #'Portfolio-Ejercicio'!
-OutTransfer class
+!classDefinition: 'SummaryReport class' category: #'Portfolio-Ejercicio'!
+SummaryReport class
 	instanceVariableNames: ''!
 
-!OutTransfer class methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 21:29:25'!
-for: aTransfer 
+!SummaryReport class methodsFor: 'instance creation' stamp: 'DL 6/25/2020 20:54:54'!
+account: anAccount
+	^self new initializeWithAccount: anAccount! !
 
-	^self new initializeWith: aTransfer.! !
-
-!OutTransfer class methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 21:25:34'!
-register: aTransfer on: account 
-
-	| transaction |
-	
-	transaction := self for: aTransfer.
-	account register: transaction.
-		
-	^ transaction! !
+!SummaryReport class methodsFor: 'instance creation' stamp: 'DL 6/25/2020 20:52:04'!
+transactions: aTransactions account: anAccount
+	^self new initializeTransactions: aTransactions account: anAccount! !
 
 
 !classDefinition: #Transfer category: #'Portfolio-Ejercicio'!
@@ -1121,6 +1304,13 @@ Object subclass: #Transfer
 !Transfer methodsFor: 'initialization' stamp: 'MF 6/25/2020 16:28:55'!
 initializeWith: value 
 
+	amount := value.! !
+
+!Transfer methodsFor: 'initialization' stamp: 'DL 6/22/2020 20:37:37'!
+initializeWith: senderAccount with: recipientAccount with: value 
+
+	sender := senderAccount.
+	recipient := recipientAccount.
 	amount := value.! !
 
 !Transfer methodsFor: 'initialization' stamp: 'DL 6/22/2020 21:33:17'!
@@ -1156,7 +1346,7 @@ notEnoughFundsErrorDescription
 
 	^'Not Enough funds available.'! !
 
-!Transfer class methodsFor: 'as yet unclassified' stamp: 'MF 6/25/2020 16:28:21'!
+!Transfer class methodsFor: 'as yet unclassified' stamp: 'DL 6/25/2020 20:31:32'!
 register: value from: senderAccount to: recipientAccount
 
 	| transfer inTransfer outTransfer |
