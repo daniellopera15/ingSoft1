@@ -735,7 +735,7 @@ TestCase subclass: #TransferTest
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
 
-!TransferTest methodsFor: 'as yet unclassified' stamp: 'MF 6/27/2020 19:19:34'!
+!TransferTest methodsFor: 'tests' stamp: 'MF 6/27/2020 19:19:34'!
 test01transferBetweenAccountsShouldWork
 
 	| account1 account2 |
@@ -751,7 +751,7 @@ test01transferBetweenAccountsShouldWork
 	self assert: 1000 equals: account2 balance.
 ! !
 
-!TransferTest methodsFor: 'as yet unclassified' stamp: 'MF 6/27/2020 19:21:02'!
+!TransferTest methodsFor: 'tests' stamp: 'MF 6/27/2020 19:21:02'!
 test02shouldNotBeAbleToTransferToSelf
 
 	| account |
@@ -762,7 +762,7 @@ test02shouldNotBeAbleToTransferToSelf
 	self should: [Transfer register: 1000 from: account to: account.] raise: Error withMessageText: Transfer transferToSameAccountErrorDescription
 ! !
 
-!TransferTest methodsFor: 'as yet unclassified' stamp: 'MF 6/27/2020 19:25:10'!
+!TransferTest methodsFor: 'tests' stamp: 'MF 6/27/2020 19:25:10'!
 test03mustTransferAPositiveAmount
 
 	| account1 account2 |
@@ -776,7 +776,7 @@ test03mustTransferAPositiveAmount
 	raise: Error withMessageText: Transfer transferNonPositiveErrorDescription.
 ! !
 
-!TransferTest methodsFor: 'as yet unclassified' stamp: 'MF 6/27/2020 19:27:43'!
+!TransferTest methodsFor: 'tests' stamp: 'MF 6/27/2020 19:27:43'!
 test04flowBetweenTransferLegsShouldWork
 
 	| account1 account2 inTransfer outTransfer transfer |
@@ -795,7 +795,7 @@ test04flowBetweenTransferLegsShouldWork
 	self assert: outTransfer equals: inTransfer transfer outTransfer. 
 	self assert: inTransfer equals: outTransfer transfer inTransfer. ! !
 
-!TransferTest methodsFor: 'as yet unclassified' stamp: 'MF 6/27/2020 19:28:49'!
+!TransferTest methodsFor: 'tests' stamp: 'MF 6/27/2020 19:28:49'!
 test05accountsShouldRegisterTransactionLegs
 
 	| account1 account2 transaction |
@@ -851,7 +851,6 @@ hasAccountInCommonWith: aPortfolioEntry
 isReachable: aPortfolioEntry
 	
 	^self subclassResponsibility! !
-
 
 
 !classDefinition: #Portfolio category: #'Portfolio-Ejercicio'!
@@ -932,14 +931,13 @@ validateTreeStructureNotBrokenWhenAdding: aPortfolioEntry
 
 	^ (self hasAnyRootPortfolioAccountInCommonWith: aPortfolioEntry) ifTrue: [self signalTreeStructureBroken]! !
 
-
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Portfolio class' category: #'Portfolio-Ejercicio'!
 Portfolio class
 	instanceVariableNames: ''!
 
-!Portfolio class methodsFor: 'as yet unclassified' stamp: 'MF 6/20/2020 18:13:02'!
+!Portfolio class methodsFor: 'error descriptions' stamp: 'MF 6/20/2020 18:13:02'!
 cantBreakTreeStructureErrorDescription
 	^'cannot create cyclic references to accounts nor Portfolios'! !
 
@@ -994,7 +992,6 @@ isReachable: aPortfolioEntry
 !ReceptiveAccount methodsFor: 'adding' stamp: 'MF 6/22/2020 19:36:13'!
 addTo: aPortfolio! !
 
-
 
 !classDefinition: #AccountTransaction category: #'Portfolio-Ejercicio'!
 Object subclass: #AccountTransaction
@@ -1020,7 +1017,7 @@ transferNetReport
  	^self subclassResponsibility.! !
 
 
-!AccountTransaction methodsFor: 'as yet unclassified' stamp: 'MF 6/27/2020 18:15:58'!
+!AccountTransaction methodsFor: 'report' stamp: 'MF 6/27/2020 18:15:58'!
 reportTo: aReport 
 	^self subclassResponsibility.! !
 
@@ -1065,7 +1062,8 @@ applyToBalance: balance
 
 	^ balance + self value.! !
 
-!Deposit methodsFor: 'balance operation' stamp: 'MF 6/27/2020 18:21:06'!
+
+!Deposit methodsFor: 'report' stamp: 'MF 6/27/2020 18:21:06'!
 reportTo: aReport
 
 	^aReport reportForDeposit: self.! !
@@ -1089,15 +1087,16 @@ AccountTransaction subclass: #TransferLeg
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
 
-!TransferLeg methodsFor: 'as yet unclassified' stamp: 'DL 6/25/2020 20:29:01'!
-transfer
-
-	^transfer.! !
-
-!TransferLeg methodsFor: 'as yet unclassified' stamp: 'DL 6/25/2020 20:34:48'!
+!TransferLeg methodsFor: 'value' stamp: 'DL 6/25/2020 20:34:48'!
 value
 
 	^transfer value.! !
+
+
+!TransferLeg methodsFor: 'transfer' stamp: 'DL 6/25/2020 20:29:01'!
+transfer
+
+	^transfer.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1105,7 +1104,7 @@ value
 TransferLeg class
 	instanceVariableNames: ''!
 
-!TransferLeg class methodsFor: 'as yet unclassified' stamp: 'DL 6/25/2020 20:30:17'!
+!TransferLeg class methodsFor: 'instance creation' stamp: 'DL 6/25/2020 20:30:17'!
 for: aTransfer 
 
 	^self new initializeWith: aTransfer.! !
@@ -1124,14 +1123,15 @@ initializeWith: aTransfer
 	transfer := aTransfer.! !
 
 
-!InTransfer methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 21:33:54'!
+!InTransfer methodsFor: 'report' stamp: 'MF 6/27/2020 18:21:24'!
+reportTo: aReport 
+	^aReport  reportForInTransfer: self.! !
+
+
+!InTransfer methodsFor: 'balance operation' stamp: 'DL 6/22/2020 21:33:54'!
 applyToBalance: balance 
 	
 	^balance + self value.! !
-
-!InTransfer methodsFor: 'as yet unclassified' stamp: 'MF 6/27/2020 18:21:24'!
-reportTo: aReport 
-	^aReport  reportForInTransfer: self.! !
 
 
 !classDefinition: #OutTransfer category: #'Portfolio-Ejercicio'!
@@ -1147,12 +1147,13 @@ initializeWith: aTransfer
 	transfer := aTransfer.! !
 
 
-!OutTransfer methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 21:34:18'!
+!OutTransfer methodsFor: 'balance operation' stamp: 'DL 6/22/2020 21:34:18'!
 applyToBalance: balance
 
 	^balance - self value.! !
 
-!OutTransfer methodsFor: 'as yet unclassified' stamp: 'MF 6/27/2020 18:21:41'!
+
+!OutTransfer methodsFor: 'report' stamp: 'MF 6/27/2020 18:21:41'!
 reportTo: aReport 
 	^aReport  reportForOutTransfer: self.! !
 
@@ -1182,7 +1183,7 @@ applyToBalance: balance
 	^ balance - self value.! !
 
 
-!Withdraw methodsFor: 'as yet unclassified' stamp: 'MF 6/27/2020 18:21:50'!
+!Withdraw methodsFor: 'report' stamp: 'MF 6/27/2020 18:21:50'!
 reportTo: aReport 
 	^aReport reportForWithdraw: self.! !
 
@@ -1283,6 +1284,16 @@ reportForWithdraw: aWithdraw
 report
 	^self subclassResponsibility.! !
 
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Report class' category: #'Portfolio-Ejercicio'!
+Report class
+	instanceVariableNames: ''!
+
+!Report class methodsFor: 'instance creation' stamp: 'MF 6/27/2020 19:35:45'!
+account: anAccount
+	^self new initializeWithAccount: anAccount! !
+
 
 !classDefinition: #SummaryReport category: #'Portfolio-Ejercicio'!
 Report subclass: #SummaryReport
@@ -1325,16 +1336,6 @@ reportForWithdraw: aWithdraw
 getTransactionsReport
 	^ transactions collect: [:transaction | transaction reportTo: self]! !
 
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'SummaryReport class' category: #'Portfolio-Ejercicio'!
-SummaryReport class
-	instanceVariableNames: ''!
-
-!SummaryReport class methodsFor: 'instance creation' stamp: 'DL 6/25/2020 20:54:54'!
-account: anAccount
-	^self new initializeWithAccount: anAccount! !
-
 
 !classDefinition: #TransferNetReport category: #'Portfolio-Ejercicio'!
 Report subclass: #TransferNetReport
@@ -1373,17 +1374,6 @@ report
 	^self getTransactionsReport.
 ! !
 
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'TransferNetReport class' category: #'Portfolio-Ejercicio'!
-TransferNetReport class
-	instanceVariableNames: ''!
-
-!TransferNetReport class methodsFor: 'as yet unclassified' stamp: 'MF 6/27/2020 17:50:38'!
-account: anAccount
-
-	^self new initializeWithAccount: anAccount.! !
-
 
 !classDefinition: #Transfer category: #'Portfolio-Ejercicio'!
 Object subclass: #Transfer
@@ -1410,21 +1400,22 @@ value
 	^amount.! !
 
 
-!Transfer methodsFor: 'as yet unclassified' stamp: 'MF 6/25/2020 16:23:31'!
-inTransfer
-	^inTransfer! !
-
-!Transfer methodsFor: 'as yet unclassified' stamp: 'MF 6/25/2020 16:29:41'!
-inTransfer: anInTransfer 
-	inTransfer _ anInTransfer! !
-
-!Transfer methodsFor: 'as yet unclassified' stamp: 'MF 6/25/2020 16:24:10'!
+!Transfer methodsFor: 'out transfer' stamp: 'MF 6/25/2020 16:24:10'!
 outTransfer
 	^outTransfer! !
 
-!Transfer methodsFor: 'as yet unclassified' stamp: 'MF 6/25/2020 16:29:31'!
+!Transfer methodsFor: 'out transfer' stamp: 'MF 6/25/2020 16:29:31'!
 outTransfer: anOutTransfer 
 	outTransfer _ anOutTransfer! !
+
+
+!Transfer methodsFor: 'in transfer' stamp: 'MF 6/25/2020 16:23:31'!
+inTransfer
+	^inTransfer! !
+
+!Transfer methodsFor: 'in transfer' stamp: 'MF 6/25/2020 16:29:41'!
+inTransfer: anInTransfer 
+	inTransfer _ anInTransfer! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1432,12 +1423,23 @@ outTransfer: anOutTransfer
 Transfer class
 	instanceVariableNames: ''!
 
-!Transfer class methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 20:13:02'!
+!Transfer class methodsFor: 'error descriptions' stamp: 'DL 6/22/2020 20:13:02'!
 notEnoughFundsErrorDescription
 
 	^'Not Enough funds available.'! !
 
-!Transfer class methodsFor: 'as yet unclassified' stamp: 'MF 6/27/2020 19:24:47'!
+!Transfer class methodsFor: 'error descriptions' stamp: 'MF 6/27/2020 19:24:47'!
+transferNonPositiveErrorDescription
+	
+	^'Cannot transfer negative balance'.! !
+
+!Transfer class methodsFor: 'error descriptions' stamp: 'DL 6/22/2020 20:01:50'!
+transferToSameAccountErrorDescription
+
+	^'Cannot transfer to same account'.! !
+
+
+!Transfer class methodsFor: 'instance creation' stamp: 'MF 6/27/2020 19:24:47'!
 register: value from: senderAccount to: recipientAccount
 
 	| transfer inTransfer outTransfer |
@@ -1453,13 +1455,3 @@ register: value from: senderAccount to: recipientAccount
 	transfer inTransfer: inTransfer.
 	
 	^transfer.! !
-
-!Transfer class methodsFor: 'as yet unclassified' stamp: 'MF 6/27/2020 19:24:47'!
-transferNonPositiveErrorDescription
-	
-	^'Cannot transfer negative balance'.! !
-
-!Transfer class methodsFor: 'as yet unclassified' stamp: 'DL 6/22/2020 20:01:50'!
-transferToSameAccountErrorDescription
-
-	^'Cannot transfer to same account'.! !
