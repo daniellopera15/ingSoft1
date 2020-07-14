@@ -31,15 +31,16 @@ test02CannotCreateWithEmptyCardName
 		raise: Error - MessageNotUnderstood
 		withMessageText: Card emptyCardNameErrorDescription.! !
 
-!CardTest methodsFor: 'tests' stamp: 'MF 7/10/2020 16:54:30'!
+!CardTest methodsFor: 'tests' stamp: 'DL 7/14/2020 18:35:00'!
 test03OldCardShouldBeExpired
 	
-	self assert: (Card withNumber: validCcn expiringOn: expiredMonthOfYear withName: validCco) isExpired.! !
+	self assert: ((Card withNumber: validCcn expiringOn: expiredMonthOfYear withName: validCco) 
+	isExpiredOn: FixedGregorianDate today).! !
 
-!CardTest methodsFor: 'tests' stamp: 'MF 7/10/2020 16:54:51'!
+!CardTest methodsFor: 'tests' stamp: 'DL 7/14/2020 18:35:30'!
 test04NewCardShouldNotBeExpired
 	
-	self deny: (Card withNumber: validCcn expiringOn: nonExpiredMonthOfYear withName: validCco) isExpired.! !
+	self deny: ((Card withNumber: validCcn expiringOn: nonExpiredMonthOfYear withName: validCco) isExpiredOn: FixedGregorianDate today).! !
 
 
 !classDefinition: #CartTest category: #TusLibros!
@@ -191,12 +192,12 @@ itemSellByTheStore
 
 !classDefinition: #CashierTest category: #TusLibros!
 TestCase subclass: #CashierTest
-	instanceVariableNames: 'catalogue expiredCard nonExpiredCard'
+	instanceVariableNames: 'catalogue expiredCard nonExpiredCard todayDate'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!CashierTest methodsFor: 'setup' stamp: 'MF 7/10/2020 17:18:24'!
+!CashierTest methodsFor: 'setup' stamp: 'DL 7/14/2020 18:49:24'!
 setUp
 
 	| expiredMonthOfYear nonExpiredMonthOfYear |
@@ -205,21 +206,24 @@ setUp
 	nonExpiredMonthOfYear := GregorianMonthOfYear yearNumber: 3333 monthNumber: 10.
 
 	expiredCard := Card withNumber: '1111111111111111' expiringOn: expiredMonthOfYear withName: 'Edgar'.
+	
+	todayDate := FixedGregorianDate yearNumber: 2020 monthNumber: 07 dayNumber: 14.
+	
 	nonExpiredCard := Card withNumber: '1111111111111111' expiringOn: nonExpiredMonthOfYear withName: 'Edgar'.
 	
 	catalogue := Dictionary new.
 	catalogue at: 1 put: 10.! !
 
 
-!CashierTest methodsFor: 'tests' stamp: 'MF 7/10/2020 18:33:10'!
+!CashierTest methodsFor: 'tests' stamp: 'DL 7/14/2020 18:49:24'!
 assertCashierCheckoutFor: aCart and: aCard FailsWith: anErrorDescription
 
 	| cashier salesBook |
 	
 	salesBook := OrderedCollection new.
-	cashier := Cashier with: salesBook.
+	cashier := Cashier with: salesBook with: nil.
 	
-	self should: [cashier checkout: aCart with: aCard ]
+	self should: [cashier checkout: aCart with: aCard on: todayDate]
 		raise: Error - MessageNotUnderstood 
 		withExceptionDo: [:anError |
 			self assert: anErrorDescription equals: anError messageText.
@@ -227,7 +231,7 @@ assertCashierCheckoutFor: aCart and: aCard FailsWith: anErrorDescription
 			]	
 	! !
 
-!CashierTest methodsFor: 'tests' stamp: 'MF 7/10/2020 18:37:09'!
+!CashierTest methodsFor: 'tests' stamp: 'DL 7/14/2020 18:49:44'!
 test01CannotCheckoutAnEmptyCart
 
 	| cart |
@@ -237,7 +241,7 @@ test01CannotCheckoutAnEmptyCart
 		FailsWith: Cashier checkingOutEmptyCartErrorDescription.
 	! !
 
-!CashierTest methodsFor: 'tests' stamp: 'MF 7/10/2020 18:37:37'!
+!CashierTest methodsFor: 'tests' stamp: 'DL 7/14/2020 18:18:00'!
 test02CannotCheckoutWithAnExpiredCard
 	
 	| cart isbn |
@@ -249,18 +253,87 @@ test02CannotCheckoutWithAnExpiredCard
 		FailsWith: Cashier checkingOutWithExpiredCardErrorDescription .
 ! !
 
-!CashierTest methodsFor: 'tests' stamp: 'MF 7/10/2020 18:40:39'!
-test03ValidCartAndCardShouldCheckoutCorrectly
+!CashierTest methodsFor: 'tests' stamp: 'DL 7/14/2020 19:02:18'!
+test03ValidCartAndCardShouldCheckoutCorrectlyOnMerchanProcessorOkResponse
 
-	| cart cashier salesBook |
+	| cart cashier salesBook internalMerchantProcessor isMerchantProcessorCalled |
 	cart := Cart acceptingItemsOf: catalogue.
 	salesBook := OrderedCollection new.
 	cart add: 1.
-	cashier := Cashier with: salesBook.
 	
-	self assert: 10 equals: (cashier checkout: cart with: nonExpiredCard).
+	isMerchantProcessorCalled := false.
+	internalMerchantProcessor := MerchantProcessorSimulator 
+	debitingWith: [isMerchantProcessorCalled := true.].
+	cashier := Cashier with: salesBook with: internalMerchantProcessor.
+	
+	self assert: 10 equals: (cashier checkout: cart with: nonExpiredCard on: todayDate).
 	self assert: 1 equals: salesBook size.
 	self assert: 10 equals: (salesBook at: 1).
+	self assert: isMerchantProcessorCalled.
+! !
+
+!CashierTest methodsFor: 'tests' stamp: 'DL 7/14/2020 18:55:26'!
+test04DoesNotFinishSaleWithStolenCard
+
+	| cart cashier salesBook internalMerchantProcessor |
+	cart := Cart acceptingItemsOf: catalogue.
+	salesBook := OrderedCollection new.
+	cart add: 1.
+	
+	internalMerchantProcessor := MerchantProcessorSimulator debitingWith: [self error: 'Cannot checkout with a stolen card.'].
+	
+	cashier := Cashier with: salesBook with: internalMerchantProcessor.
+	
+	self should: [cashier checkout: cart with: nonExpiredCard on: todayDate] 
+	raise: Error
+	withExceptionDo: [:anError |
+			self assert: 'Cannot checkout with a stolen card.' equals: anError messageText.
+			self assert: 0 equals: salesBook size.
+			].
+
+! !
+
+!CashierTest methodsFor: 'tests' stamp: 'DL 7/14/2020 18:56:18'!
+test05DoesNotFinishSaleWithACardWithoutEnoughFounds
+
+	| cart cashier salesBook internalMerchantProcessor |
+	cart := Cart acceptingItemsOf: catalogue.
+	salesBook := OrderedCollection new.
+	cart add: 1.
+	
+	internalMerchantProcessor := MerchantProcessorSimulator debitingWith: [self error: 'Cannot checkout with a card without enough founds.'].
+	
+	cashier := Cashier with: salesBook with: internalMerchantProcessor.
+	
+	self should: [cashier checkout: cart with: nonExpiredCard on: FixedGregorianDate today] 
+	raise: Error
+	withExceptionDo: [:anError |
+			self assert: 'Cannot checkout with a card without enough founds.' equals: anError messageText.
+			self assert: 0 equals: salesBook size.
+			].
+
+! !
+
+!CashierTest methodsFor: 'tests' stamp: 'DL 7/14/2020 18:58:41'!
+test06MerchantProccesorIsNotUsedIfACardIsExpired
+
+	| cart cashier salesBook internalMerchantProcessor isMerchantProcessorCalled |
+	cart := Cart acceptingItemsOf: catalogue.
+	salesBook := OrderedCollection new.
+	cart add: 1.
+	
+	isMerchantProcessorCalled := false.
+	
+	internalMerchantProcessor := 
+	MerchantProcessorSimulator debitingWith: [isMerchantProcessorCalled := true.].
+	
+	cashier := Cashier with: salesBook with: internalMerchantProcessor.
+	
+	self should: [cashier checkout: cart with: expiredCard on: todayDate] 
+	raise: Error - MessageNotUnderstood
+	withExceptionDo: [:anError |
+			self deny: isMerchantProcessorCalled].
+
 ! !
 
 
@@ -278,13 +351,10 @@ initializeWithNumber: aCardNumber expiringOn: aMonthOfYearExpiration withName: a
 	cardName := aCardName.! !
 
 
-!Card methodsFor: 'assertions' stamp: 'MF 7/10/2020 16:41:30'!
-isExpired
-	| currentMonthOfYear |
-		
-	currentMonthOfYear := GregorianMonthOfYear current.
+!Card methodsFor: 'assertions' stamp: 'DL 7/14/2020 18:33:30'!
+isExpiredOn: aDate 
 	
-	^monthOfYearExpiration < currentMonthOfYear! !
+	^monthOfYearExpiration < aDate monthOfYear.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -393,11 +463,10 @@ acceptingItemsOf: aCatalog
 
 	^self new initializeAcceptingItemsOf: aCatalog ! !
 
-
 
 !classDefinition: #Cashier category: #TusLibros!
 Object subclass: #Cashier
-	instanceVariableNames: 'salesBook'
+	instanceVariableNames: 'salesBook merchantProcessor'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
@@ -413,24 +482,28 @@ signalExpiredCardCheckout
 	^ self error: self class checkingOutWithExpiredCardErrorDescription! !
 
 
-!Cashier methodsFor: 'checkout' stamp: 'MF 7/10/2020 18:28:02'!
-checkout: aCart with: aCard
+!Cashier methodsFor: 'checkout' stamp: 'DL 7/14/2020 18:25:30'!
+checkout: aCart with: aCard on: aDate 
 	| subtotal |
 	
 	aCart isEmpty ifTrue: [ self signalEmptyCartCheckout ].
-	aCard isExpired ifTrue: [ self signalExpiredCardCheckout ].
+	(aCard isExpiredOn: aDate) ifTrue: [ self signalExpiredCardCheckout ].
 	
 	subtotal := aCart subtotal.
 	
-	salesBook add: subtotal.
+	merchantProcessor debit: subtotal from: aCard.
 	
+	salesBook add: subtotal.
+		
 	^subtotal.
 ! !
 
 
-!Cashier methodsFor: 'initialization' stamp: 'MF 7/10/2020 17:58:03'!
-initializeWith: aSalesBook 
-	salesBook := aSalesBook.! !
+!Cashier methodsFor: 'initialization' stamp: 'DL 7/13/2020 21:03:55'!
+initializeWith: aSalesBook with: aMerchantProcessor
+
+	salesBook := aSalesBook.
+	merchantProcessor := aMerchantProcessor.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -447,6 +520,50 @@ checkingOutWithExpiredCardErrorDescription
 	^'cannot checkout with an expired card'.! !
 
 
-!Cashier class methodsFor: 'instance creation' stamp: 'MF 7/10/2020 17:57:50'!
-with: aSalesBook 
-	^self new initializeWith: aSalesBook.! !
+!Cashier class methodsFor: 'instance creation' stamp: 'DL 7/13/2020 21:04:09'!
+with: aSalesBook with: aMerchantProcessor
+	
+	^self new initializeWith: aSalesBook with: aMerchantProcessor.! !
+
+
+!classDefinition: #MerchantProcessor category: #TusLibros!
+Object subclass: #MerchantProcessor
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!MerchantProcessor methodsFor: 'operations' stamp: 'DL 7/14/2020 17:55:11'!
+debit: anAmount from: aCard
+
+	self subclassResponsibility.! !
+
+
+!classDefinition: #MerchantProcessorSimulator category: #TusLibros!
+MerchantProcessor subclass: #MerchantProcessorSimulator
+	instanceVariableNames: 'blockToValue'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!MerchantProcessorSimulator methodsFor: 'initialization' stamp: 'DL 7/14/2020 17:57:59'!
+initializeWith: aBlock 
+
+	blockToValue := aBlock.! !
+
+
+!MerchantProcessorSimulator methodsFor: 'operations' stamp: 'DL 7/14/2020 17:55:29'!
+debit: anAmount from: aCard
+
+	^blockToValue value.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'MerchantProcessorSimulator class' category: #TusLibros!
+MerchantProcessorSimulator class
+	instanceVariableNames: ''!
+
+!MerchantProcessorSimulator class methodsFor: 'as yet unclassified' stamp: 'DL 7/14/2020 17:57:27'!
+debitingWith: aBlock
+
+	^self new initializeWith: aBlock.! !
