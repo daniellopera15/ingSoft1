@@ -215,7 +215,7 @@ setUp
 	catalogue at: 1 put: 10.! !
 
 
-!CashierTest methodsFor: 'tests' stamp: 'DL 7/20/2020 20:25:41'!
+!CashierTest methodsFor: 'tests' stamp: 'DL 7/21/2020 18:39:01'!
 assertCashierCheckoutFor: aCart and: aCard FailsWith: anErrorDescription
 
 	| cashier salesBook |
@@ -223,7 +223,7 @@ assertCashierCheckoutFor: aCart and: aCard FailsWith: anErrorDescription
 	salesBook := OrderedCollection new.
 	cashier := Cashier with: salesBook with: nil.
 	
-	self should: [cashier checkout: aCart with: aCard on: todayDate]
+	self should: [cashier checkout: aCart from: 1 with: aCard on: todayDate]
 		raise: Error - MessageNotUnderstood 
 		withExceptionDo: [:anError |
 			self assert: anErrorDescription equals: anError messageText.
@@ -253,26 +253,28 @@ test02CannotCheckoutWithAnExpiredCard
 		FailsWith: Cashier checkingOutWithExpiredCardErrorDescription .
 ! !
 
-!CashierTest methodsFor: 'tests' stamp: 'DL 7/20/2020 20:26:02'!
+!CashierTest methodsFor: 'tests' stamp: 'DL 7/21/2020 19:12:31'!
 test03ValidCartAndCardShouldCheckoutCorrectlyOnMerchanProcessorOkResponse
 
-	| cart cashier salesBook internalMerchantProcessor isMerchantProcessorCalled |
+	| cart cashier salesBook internalMerchantProcessor isMerchantProcessorCalled clientId |
 	cart := Cart acceptingItemsOf: catalogue.
 	salesBook := OrderedCollection new.
 	cart add: 1.
+	clientId := '1'.
 	
 	isMerchantProcessorCalled := false.
 	internalMerchantProcessor := MerchantProcessorSimulator 
 	debitingWith: [isMerchantProcessorCalled := true.].
 	cashier := Cashier with: salesBook with: internalMerchantProcessor.
 	
-	self assert: 10 equals: (cashier checkout: cart with: nonExpiredCard on: todayDate).
+	self assert: 10 equals: (cashier checkout: cart from: clientId with: nonExpiredCard on: todayDate).
 	self assert: 1 equals: salesBook size.
-	self assert: 10 equals: (salesBook at: 1).
+	self assert: ((salesBook at: 1) wasMadeTo: '1').
+	self assert: 10 equals: (salesBook at: 1) subtotal.
 	self assert: isMerchantProcessorCalled.
 ! !
 
-!CashierTest methodsFor: 'tests' stamp: 'DL 7/20/2020 20:26:17'!
+!CashierTest methodsFor: 'tests' stamp: 'DL 7/21/2020 18:39:01'!
 test04DoesNotFinishSaleWithStolenCard
 
 	| cart cashier salesBook internalMerchantProcessor |
@@ -284,7 +286,7 @@ test04DoesNotFinishSaleWithStolenCard
 	
 	cashier := Cashier with: salesBook with: internalMerchantProcessor.
 	
-	self should: [cashier checkout: cart with: nonExpiredCard on: todayDate] 
+	self should: [cashier checkout: cart from: 1 with: nonExpiredCard on: todayDate] 
 	raise: Error
 	withExceptionDo: [:anError |
 			self assert: 'Cannot checkout with a stolen card.' equals: anError messageText.
@@ -293,7 +295,7 @@ test04DoesNotFinishSaleWithStolenCard
 
 ! !
 
-!CashierTest methodsFor: 'tests' stamp: 'DL 7/20/2020 20:26:35'!
+!CashierTest methodsFor: 'tests' stamp: 'DL 7/21/2020 18:39:01'!
 test05DoesNotFinishSaleWithACardWithoutEnoughFounds
 
 	| cart cashier salesBook internalMerchantProcessor |
@@ -305,7 +307,7 @@ test05DoesNotFinishSaleWithACardWithoutEnoughFounds
 	
 	cashier := Cashier with: salesBook with: internalMerchantProcessor.
 	
-	self should: [cashier checkout: cart with: nonExpiredCard on: FixedGregorianDate today] 
+	self should: [cashier checkout: cart from: 1 with: nonExpiredCard on: FixedGregorianDate today] 
 	raise: Error
 	withExceptionDo: [:anError |
 			self assert: 'Cannot checkout with a card without enough founds.' equals: anError messageText.
@@ -314,7 +316,7 @@ test05DoesNotFinishSaleWithACardWithoutEnoughFounds
 
 ! !
 
-!CashierTest methodsFor: 'tests' stamp: 'DL 7/20/2020 20:26:51'!
+!CashierTest methodsFor: 'tests' stamp: 'DL 7/21/2020 18:39:01'!
 test06MerchantProccesorIsNotUsedIfACardIsExpired
 
 	| cart cashier salesBook internalMerchantProcessor isMerchantProcessorCalled |
@@ -329,7 +331,7 @@ test06MerchantProccesorIsNotUsedIfACardIsExpired
 	
 	cashier := Cashier with: salesBook with: internalMerchantProcessor.
 	
-	self should: [cashier checkout: cart with: expiredCard on: todayDate] 
+	self should: [cashier checkout: cart from: 1 with: expiredCard on: todayDate] 
 	raise: Error - MessageNotUnderstood
 	withExceptionDo: [:anError |
 			self deny: isMerchantProcessorCalled].
@@ -339,22 +341,26 @@ test06MerchantProccesorIsNotUsedIfACardIsExpired
 
 !classDefinition: #TusLibrosInterfaceTest category: #TusLibros!
 TestCase subclass: #TusLibrosInterfaceTest
-	instanceVariableNames: 'workingMerchantProcessor'
+	instanceVariableNames: 'workingMerchantProcessor interfaceCatalog blockingUserAuthenticationService workingUserAuthenticationService product1 product1Price clock'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/20/2020 20:39:01'!
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:31:57'!
+assert: aClient withPassword: aPassword boughtAQuantityOf: anAmountOfProduct1 on: aTusLibrosInterface 
+
+	self assert: anAmountOfProduct1 equals: (((aTusLibrosInterface listPurchases: aClient authenticatingWith: aPassword) at: 'purchasesItems') occurrencesOf: product1).
+	
+	self assert: product1Price*anAmountOfProduct1 equals: ((aTusLibrosInterface listPurchases: aClient authenticatingWith: aPassword) at: 'totalPrice').
+	! !
+
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 22:15:34'!
 test01
 
-	| clientId password tusLibros userAuthenticationService catalog |
+	| clientId password tusLibros |
 	
-	catalog := Dictionary new.
-	catalog at: 1 put: 10.
-	userAuthenticationService := UserAuthenticationServiceSimulator authenticatingWith: [:id :pass | self error: 'User not authenticated'].
-	
-	tusLibros := TusLibrosInterface with: userAuthenticationService with: catalog with: OrderedCollection new with: workingMerchantProcessor.
+	tusLibros := TusLibrosInterface with: blockingUserAuthenticationService with: interfaceCatalog with: OrderedCollection new with: workingMerchantProcessor with: clock.
 	clientId := '1'.
 	password := '1234'.
 	
@@ -365,15 +371,12 @@ test01
 	
 	! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/20/2020 20:39:36'!
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:08:39'!
 test02
 
-	| clientId password tusLibros userAuthenticationService cartId catalog |
+	| clientId password tusLibros cartId |
 	
-	catalog := Dictionary new.
-	catalog at: 1 put: 10.
-	userAuthenticationService := UserAuthenticationServiceSimulator authenticatingWith: [:id :pass | true].
-	tusLibros := TusLibrosInterface with: userAuthenticationService with: catalog with: OrderedCollection new with: workingMerchantProcessor.
+	tusLibros := self buildInterface.
 	clientId := '1'.
 	password := '1234'.
 	
@@ -383,30 +386,25 @@ test02
 	
 	! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/20/2020 20:40:03'!
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:10:02'!
 test03
 
-	| tusLibros userAuthenticationService catalog |
+	| tusLibros |
 	
-	catalog := Dictionary new.
-	catalog at: 1 put: 10.
-	tusLibros := TusLibrosInterface with: userAuthenticationService with: catalog with: OrderedCollection new with: workingMerchantProcessor.
+	tusLibros := self buildInterface.
 
 	self should: [ tusLibros listCart: Object new ]
 	raise: Error - MessageNotUnderstood
-	withMessageText: 'Cart not found'.
+	withMessageText: TusLibrosInterface activeCartNotFoundErrorDescription.
 	
 	! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/20/2020 20:40:15'!
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:10:42'!
 test04
 
-	| clientId password tusLibros userAuthenticationService cartId cartId2 catalog |
+	| clientId password tusLibros cartId cartId2 |
 	
-	catalog := Dictionary new.
-	catalog at: 1 put: 10.
-	userAuthenticationService := UserAuthenticationServiceSimulator authenticatingWith: [:id :pass | true].
-	tusLibros := TusLibrosInterface with: userAuthenticationService with: catalog with: OrderedCollection new with: workingMerchantProcessor.
+	tusLibros := self buildInterface.
 	clientId := '1'.
 	password := '1234'.
 	
@@ -418,31 +416,26 @@ test04
 	
 	! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/20/2020 20:40:29'!
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:11:02'!
 test05
 
-	| tusLibros userAuthenticationService catalog |
+	| tusLibros  |
 	
-	catalog := Dictionary new.
-	catalog at: 1 put: 10.
-	tusLibros := TusLibrosInterface with: userAuthenticationService with: catalog with: OrderedCollection new with: workingMerchantProcessor.
+	tusLibros := self buildInterface.
 
 	self should: [ tusLibros add: 1 of: 1 to: Object new ]
 	raise: Error - MessageNotUnderstood
-	withMessageText: 'Cart not found'.
+	withMessageText: TusLibrosInterface activeCartNotFoundErrorDescription.
 
 	
 	! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/20/2020 20:40:37'!
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:11:35'!
 test06
 
-	| clientId password tusLibros userAuthenticationService cartId catalog |
+	| clientId password tusLibros cartId |
 	
-	catalog := Dictionary new.
-	catalog at: 1 put: 10.
-	userAuthenticationService := UserAuthenticationServiceSimulator authenticatingWith: [:id :pass | true].
-	tusLibros := TusLibrosInterface with: userAuthenticationService with: catalog with: OrderedCollection new with: workingMerchantProcessor.
+	tusLibros := self buildInterface.
 	clientId := '1'.
 	password := '1234'.
 	
@@ -456,16 +449,12 @@ test06
 	
 	! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/20/2020 20:40:42'!
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 22:15:34'!
 test07
 
-	| clientId password tusLibros userAuthenticationService catalog |
+	| clientId password tusLibros |
 	
-	catalog := Dictionary new.
-	catalog at: 1 put: 10.
-	userAuthenticationService := UserAuthenticationServiceSimulator authenticatingWith: [:id :pass | self error: 'User not authenticated'].
-	
-	tusLibros := TusLibrosInterface with: userAuthenticationService with: catalog with: OrderedCollection new with: workingMerchantProcessor.
+	tusLibros := TusLibrosInterface with: blockingUserAuthenticationService with: interfaceCatalog with: OrderedCollection new with: workingMerchantProcessor with: clock.
 	clientId := '1'.
 	password := '1234'.
 	
@@ -476,37 +465,32 @@ test07
 	
 	! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/20/2020 20:40:53'!
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:31:58'!
 test08
 
-	| tusLibros userAuthenticationService catalog clientId password |
+	| tusLibros clientId password |
 	
-	catalog := Dictionary new.
-	catalog at: 1 put: 10.
-	userAuthenticationService := UserAuthenticationServiceSimulator authenticatingWith: [:id :pass | true].
-	tusLibros := TusLibrosInterface with: userAuthenticationService with: catalog with: OrderedCollection new with: workingMerchantProcessor.
+	tusLibros := self buildInterface.
 	clientId := '1'.
 	password := '1234'.
 
 	self should: [ tusLibros checkout: '0' with: '1111111111111111' with: '12/2020'  with: 'Edgar' ]
 	raise: Error - MessageNotUnderstood
 	withExceptionDo: [:anError |
-		self assert: 'Cart not found' equals: anError messageText.
-		self assert: (tusLibros listPurchases: clientId authenticatingWith: password) isEmpty.
+		self assert: TusLibrosInterface activeCartNotFoundErrorDescription equals: anError messageText.
+		self assert: clientId withPassword: password boughtAQuantityOf: 0 on: tusLibros
 	].
 
 	
 	! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/20/2020 20:05:45'!
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:36:16'!
 test09
 
-	| clientId password tusLibros userAuthenticationService cartId catalog |
+	| clientId password tusLibros cartId  |
 	
-	catalog := Dictionary new.
-	catalog at: 1 put: 10.
-	userAuthenticationService := UserAuthenticationServiceSimulator authenticatingWith: [:id :pass | true].
-	tusLibros := TusLibrosInterface with: userAuthenticationService with: catalog with: OrderedCollection new with: workingMerchantProcessor.
+	
+	tusLibros := self buildInterface.
 	clientId := '1'.
 	password := '1234'.
 	
@@ -516,19 +500,17 @@ test09
 	raise: Error - MessageNotUnderstood
 	withExceptionDo: [:anError |
 		self assert: tusLibros class invalidCcnErrorDescription equals: anError messageText.
-		self assert: (tusLibros listPurchases: clientId authenticatingWith: password) isEmpty.
+		self assert: clientId withPassword: password boughtAQuantityOf: 0 on: tusLibros.
 	].	
 	! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/20/2020 20:41:12'!
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:36:50'!
 test10
 
-	| clientId password tusLibros userAuthenticationService cartId catalog |
+	| clientId password tusLibros cartId  |
 	
-	catalog := Dictionary new.
-	catalog at: 1 put: 10.
-	userAuthenticationService := UserAuthenticationServiceSimulator authenticatingWith: [:id :pass | true].
-	tusLibros := TusLibrosInterface with: userAuthenticationService with: catalog with: OrderedCollection new with: workingMerchantProcessor.
+	
+	tusLibros := self buildInterface.
 	clientId := '1'.
 	password := '1234'.
 	
@@ -538,19 +520,16 @@ test10
 	raise: Error - MessageNotUnderstood
 	withExceptionDo: [:anError |
 		self assert: (TusLibrosInterface invalidCcedErrorDescription) equals: anError messageText.
-		self assert: (tusLibros listPurchases: clientId authenticatingWith: password) isEmpty.
+		self assert: clientId withPassword: password boughtAQuantityOf: 0 on: tusLibros.
 	].	
 	! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/20/2020 20:41:17'!
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:37:14'!
 test11
 
-	| clientId password tusLibros userAuthenticationService cartId catalog |
+	| clientId password tusLibros cartId |
 	
-	catalog := Dictionary new.
-	catalog at: 1 put: 10.
-	userAuthenticationService := UserAuthenticationServiceSimulator authenticatingWith: [:id :pass | true].
-	tusLibros := TusLibrosInterface with: userAuthenticationService with: catalog with: OrderedCollection new with: workingMerchantProcessor.
+	tusLibros := self buildInterface.
 	clientId := '1'.
 	password := '1234'.
 	
@@ -560,19 +539,16 @@ test11
 	raise: Error - MessageNotUnderstood
 	withExceptionDo: [:anError |
 		self assert: (TusLibrosInterface invalidCcedErrorDescription) equals: anError messageText.
-		self assert: (tusLibros listPurchases: clientId authenticatingWith: password) isEmpty.
+		self assert: clientId withPassword: password boughtAQuantityOf: 0 on: tusLibros.
 	].	
 	! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/20/2020 20:41:23'!
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:37:38'!
 test12
 
-	| clientId password tusLibros userAuthenticationService cartId catalog |
+	| clientId password tusLibros cartId  |
 	
-	catalog := Dictionary new.
-	catalog at: 1 put: 10.
-	userAuthenticationService := UserAuthenticationServiceSimulator authenticatingWith: [:id :pass | true].
-	tusLibros := TusLibrosInterface with: userAuthenticationService with: catalog with: OrderedCollection new with: workingMerchantProcessor.
+	tusLibros := self buildInterface.
 	clientId := '1'.
 	password := '1234'.
 	
@@ -582,19 +558,16 @@ test12
 	raise: Error - MessageNotUnderstood
 	withExceptionDo: [:anError |
 		self assert: (TusLibrosInterface invalidCcedErrorDescription) equals: anError messageText.
-		self assert: (tusLibros listPurchases: clientId authenticatingWith: password) isEmpty.
+		self assert: clientId withPassword: password boughtAQuantityOf: 0 on: tusLibros.
 	].	
 	! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/20/2020 20:41:31'!
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:38:11'!
 test13
 
-	| clientId password tusLibros userAuthenticationService cartId catalog |
+	| clientId password tusLibros cartId |
 	
-	catalog := Dictionary new.
-	catalog at: 1 put: 10.
-	userAuthenticationService := UserAuthenticationServiceSimulator authenticatingWith: [:id :pass | true].
-	tusLibros := TusLibrosInterface with: userAuthenticationService with: catalog with: OrderedCollection new with: workingMerchantProcessor.
+	tusLibros := self buildInterface.
 	clientId := '1'.
 	password := '1234'.
 	
@@ -604,19 +577,16 @@ test13
 	raise: Error - MessageNotUnderstood
 	withExceptionDo: [:anError |
 		self assert: (TusLibrosInterface invalidCcedErrorDescription) equals: anError messageText.
-		self assert: (tusLibros listPurchases: clientId authenticatingWith: password) isEmpty.
+		self assert: clientId withPassword: password boughtAQuantityOf: 0 on: tusLibros.
 	].	
 	! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/20/2020 20:41:35'!
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:39:17'!
 test14
 
-	| clientId password tusLibros userAuthenticationService cartId catalog |
+	| clientId password tusLibros cartId |
 	
-	catalog := Dictionary new.
-	catalog at: 1 put: 10.
-	userAuthenticationService := UserAuthenticationServiceSimulator authenticatingWith: [:id :pass | true].
-	tusLibros := TusLibrosInterface with: userAuthenticationService with: catalog with: OrderedCollection new with: workingMerchantProcessor.
+	tusLibros := self buildInterface.
 	clientId := '1'.
 	password := '1234'.
 	
@@ -626,19 +596,16 @@ test14
 	raise: Error - MessageNotUnderstood
 	withExceptionDo: [:anError |
 		self assert: (TusLibrosInterface invalidCcedErrorDescription) equals: anError messageText.
-		self assert: (tusLibros listPurchases: clientId authenticatingWith: password) isEmpty.
+		self assert: clientId withPassword: password boughtAQuantityOf: 0 on: tusLibros.
 	].	
 	! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/20/2020 20:41:40'!
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:39:45'!
 test15
 
-	| clientId password tusLibros userAuthenticationService cartId catalog |
-	
-	catalog := Dictionary new.
-	catalog at: 1 put: 10.
-	userAuthenticationService := UserAuthenticationServiceSimulator authenticatingWith: [:id :pass | true].
-	tusLibros := TusLibrosInterface with: userAuthenticationService with: catalog with: OrderedCollection new with: workingMerchantProcessor.
+	| clientId password tusLibros cartId |
+
+	tusLibros := self buildInterface.
 	clientId := '1'.
 	password := '1234'.
 	
@@ -648,19 +615,16 @@ test15
 	raise: Error - MessageNotUnderstood
 	withExceptionDo: [:anError |
 		self assert: 'Cannot checkout empty cart' equals: anError messageText.
-		self assert: (tusLibros listPurchases: clientId authenticatingWith: password) isEmpty.
+		self assert: clientId withPassword: password boughtAQuantityOf: 0 on: tusLibros.
 	].	
 	! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/20/2020 21:23:40'!
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:40:28'!
 test16
 
-	| clientId password tusLibros userAuthenticationService cartId catalog |
+	| clientId password tusLibros cartId |
 	
-	catalog := Dictionary new.
-	catalog at: 1 put: 10.
-	userAuthenticationService := UserAuthenticationServiceSimulator authenticatingWith: [:id :pass | true].
-	tusLibros := TusLibrosInterface with: userAuthenticationService with: catalog with: OrderedCollection new with: workingMerchantProcessor.
+	tusLibros := self buildInterface.
 	clientId := '1'.
 	password := '1234'.
 	
@@ -668,18 +632,15 @@ test16
 	tusLibros add: 1 of: 1 to: cartId.
 	tusLibros checkout: cartId with: '1111111111111111' with: '12/2030'  with: 'Edgar'.
 	
-	self assert: 1 equals: ((tusLibros listPurchases: clientId authenticatingWith: password) occurrencesOf: 1).
+	self assert: clientId withPassword: password boughtAQuantityOf: 1 on: tusLibros.
 	! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/20/2020 21:25:02'!
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:41:10'!
 test17
 
-	| clientId password tusLibros userAuthenticationService cartId catalog |
+	| clientId password tusLibros cartId |
 	
-	catalog := Dictionary new.
-	catalog at: 1 put: 10.
-	userAuthenticationService := UserAuthenticationServiceSimulator authenticatingWith: [:id :pass | true].
-	tusLibros := TusLibrosInterface with: userAuthenticationService with: catalog with: OrderedCollection new with: workingMerchantProcessor.
+	tusLibros := self buildInterface.
 	clientId := '1'.
 	password := '1234'.
 	
@@ -690,19 +651,16 @@ test17
 	self should: [ tusLibros checkout: cartId with: '1111111111111111' with: '12/2030'  with: 'Edgar'. ]
 	raise: Error - MessageNotUnderstood 
 	withExceptionDo: [:anError |
-		self assert: TusLibrosInterface checkingOutCartTwiceErrorDescription equals: anError messageText.
-		self assert: 1 equals: ((tusLibros listPurchases: clientId authenticatingWith: password) occurrencesOf: 1).
+		self assert: TusLibrosInterface activeCartNotFoundErrorDescription equals: anError messageText.
+		self assert: clientId withPassword: password boughtAQuantityOf: 1 on: tusLibros.
 	]	! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/20/2020 21:43:16'!
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:42:08'!
 test18
 
-	| clientId password tusLibros userAuthenticationService catalog cartId1 cartId2 clientPurchases |
+	| clientId password tusLibros cartId1 cartId2 clientPurchases |
 	
-	catalog := Dictionary new.
-	catalog at: 1 put: 10.
-	userAuthenticationService := UserAuthenticationServiceSimulator authenticatingWith: [:id :pass | true].
-	tusLibros := TusLibrosInterface with: userAuthenticationService with: catalog with: OrderedCollection new with: workingMerchantProcessor.
+	tusLibros := self buildInterface.
 	clientId := '1'.
 	password := '1234'.
 	
@@ -715,14 +673,174 @@ test18
 	
 	clientPurchases := tusLibros listPurchases: clientId authenticatingWith: password.
 	
-	self assert: 2 equals: ((clientPurchases at: 'purchasesItems') occurrencesOf: 1).! !
+	self assert: clientId withPassword: password boughtAQuantityOf: 2 on: tusLibros.
+	! !
+
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:43:15'!
+test19
+
+	| tusLibros cartId1 cartId2 clientId1 clientId2 password1 password2 |
+	
+	tusLibros := self buildInterface.
+	clientId1 := '1'.
+	password1 := '1234'.
+	
+	clientId2 := '2'.
+	password2 := '5678'.
+	
+	cartId1 := tusLibros createCart: clientId1 authenticatingWith: password1.
+	cartId2 := tusLibros createCart: clientId2 authenticatingWith: password2.
+	tusLibros add: 2 of: 1 to: cartId1.
+	tusLibros add: 1 of: 1 to: cartId2.
+	tusLibros checkout: cartId1 with: '1111111111111111' with: '12/2030'  with: 'Edgar'.
+	tusLibros checkout: cartId2 with: '2222222222222222' with: '12/2020'  with: 'Jose'.
+	
+	self assert: clientId1 withPassword: password1 boughtAQuantityOf: 2 on: tusLibros.
+	self assert: clientId2 withPassword: password2 boughtAQuantityOf: 1 on: tusLibros.
+! !
+
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:43:47'!
+test20
+
+	| clientId password tusLibros cartId |
+	
+	tusLibros := self buildInterface.
+	clientId := '1'.
+	password := '1234'.
+	
+	cartId := tusLibros createCart: clientId authenticatingWith: password.
+	tusLibros add: 1 of: 1 to: cartId.
+	tusLibros checkout: cartId with: '1111111111111111' with: '12/2030'  with: 'Edgar'.
+	
+	self should: [tusLibros add: 1 of: 1 to: cartId.]
+	raise: Error - MessageNotUnderstood
+	withMessageText: TusLibrosInterface activeCartNotFoundErrorDescription.! !
+
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:45:48'!
+test21
+
+	| clientId password tusLibros cartId |
+	
+	tusLibros := self buildInterface.
+	clientId := '1'.
+	password := '1234'.
+	
+	cartId := tusLibros createCart: clientId authenticatingWith: password.
+	tusLibros add: 1 of: 1 to: cartId.
+	tusLibros checkout: cartId with: '1111111111111111' with: '12/2030'  with: 'Edgar'.
+	
+	self should: [tusLibros listCart: cartId.]
+	raise: Error - MessageNotUnderstood
+	withMessageText: TusLibrosInterface activeCartNotFoundErrorDescription.! !
+
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:52:00'!
+test22
+
+	| clientId password tusLibros cartId |
+	
+	tusLibros := self buildInterface.
+	clientId := '1'.
+	password := '1234'.
+	
+	cartId := tusLibros createCart: clientId authenticatingWith: password.
+	tusLibros add: 1 of: 1 to: cartId.
+	
+	self should: [tusLibros checkout: cartId with: '1111111111111111' with: '12/1990'  with: 'Edgar'.]
+	raise: Error - MessageNotUnderstood
+	withExceptionDo: [:anError | 
+		self assert: Cashier checkingOutWithExpiredCardErrorDescription equals: anError messageText.
+		self assert: clientId withPassword: password boughtAQuantityOf: 0 on: tusLibros.
+		
+		]! !
+
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:53:17'!
+test23
+
+	| clientId password tusLibros cartId |
+	
+	tusLibros := self buildInterface.
+	clientId := '1'.
+	password := '1234'.
+	
+	cartId := tusLibros createCart: clientId authenticatingWith: password.
+	tusLibros add: 1 of: 1 to: cartId.
+	
+	self should: [tusLibros checkout: cartId with: '111111111111111' with: '12/2030'  with: 'Edgar'.]
+	raise: Error - MessageNotUnderstood
+	withExceptionDo: [:anError | 
+		self assert: Card invalidCardNumberErrorDescription equals: anError messageText.
+		self assert: clientId withPassword: password boughtAQuantityOf: 0 on: tusLibros.
+		
+		]! !
+
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 22:31:41'!
+test24
+
+	| clientId password tusLibros cartId |
+	
+	tusLibros := self buildInterface.
+	clientId := '1'.
+	password := '1234'.
+	
+	cartId := tusLibros createCart: clientId authenticatingWith: password.
+	
+	clock advanceTime: (30 minutes + 1 seconds).
+	
+	self should: [tusLibros add: 1 of: 1 to: cartId.]
+	raise: Error - MessageNotUnderstood
+	withMessageText: [TusLibrosInterface sessionExpiredErrorDescription].
+	
+	clock rewindTime: (30 minutes + 1 seconds).
+	(tusLibros listCart: cartId) isEmpty. 
+	! !
+
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 22:40:23'!
+test25
+
+	| clientId password tusLibros cartId |
+	
+	tusLibros := self buildInterface.
+	clientId := '1'.
+	password := '1234'.
+	
+	cartId := tusLibros createCart: clientId authenticatingWith: password.
+	
+	clock advanceTime: (25 minutes).
+	
+	tusLibros add: 1 of: product1 to: cartId. 
+	
+	clock advanceTime: (10 minutes).
+	
+	tusLibros checkout: cartId with: '1111111111111111' with: '12/2030'  with: 'Edgar'.
+	
+	self assert: clientId withPassword: password boughtAQuantityOf: 1 on: tusLibros.
+	
+	
+	
+	! !
 
 
-!TusLibrosInterfaceTest methodsFor: 'setup' stamp: 'DL 7/20/2020 20:03:51'!
+!TusLibrosInterfaceTest methodsFor: 'setup' stamp: 'DL 7/21/2020 22:15:34'!
+buildInterface
+
+	^ TusLibrosInterface with: workingUserAuthenticationService with: interfaceCatalog with: OrderedCollection new with: workingMerchantProcessor with: clock! !
+
+!TusLibrosInterfaceTest methodsFor: 'setup' stamp: 'DL 7/21/2020 21:33:58'!
 setUp
 
 	workingMerchantProcessor := MerchantProcessorSimulator debitingWith: [].
-	! !
+	
+	blockingUserAuthenticationService := UserAuthenticationServiceSimulator authenticatingWith: [:id :pass | self error: 'User not authenticated'].
+	
+	workingUserAuthenticationService := UserAuthenticationServiceSimulator authenticatingWith: [:id :pass | true].
+	
+	product1 := 1.
+	product1Price := 10.
+	
+	interfaceCatalog := Dictionary new.
+	interfaceCatalog at: product1 put: product1Price.
+	
+	clock := ClockSimulator startingOn: (January,2020 onOrLast: 1).! !
 
 
 !classDefinition: #Card category: #TusLibros!
@@ -856,6 +974,45 @@ acceptingItemsOf: aCatalog
 	^self new initializeAcceptingItemsOf: aCatalog ! !
 
 
+!classDefinition: #CartSession category: #TusLibros!
+Object subclass: #CartSession
+	instanceVariableNames: 'cart lastTimeUsed client clock'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!CartSession methodsFor: 'as yet unclassified' stamp: 'DL 7/21/2020 22:18:46'!
+InitializeWith: aCart with: aClient with: aClock
+
+	cart := aCart.
+	client  := aClient.
+	clock  := aClock.
+	lastTimeUsed  := clock now.! !
+
+!CartSession methodsFor: 'as yet unclassified' stamp: 'DL 7/21/2020 22:48:15'!
+do: aBlock
+
+	self validateSessionTimeToLive.
+
+	^[aBlock value: cart] ensure: [lastTimeUsed := clock now].! !
+
+!CartSession methodsFor: 'as yet unclassified' stamp: 'DL 7/21/2020 22:48:15'!
+validateSessionTimeToLive
+
+	^ ((clock now) - lastTimeUsed) < (30 minutes) ifFalse: [self error: TusLibrosInterface sessionExpiredErrorDescription]! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'CartSession class' category: #TusLibros!
+CartSession class
+	instanceVariableNames: ''!
+
+!CartSession class methodsFor: 'as yet unclassified' stamp: 'DL 7/21/2020 22:17:19'!
+createWith: aCart from: aClient measuringTimeWith: aClock
+
+	^self new InitializeWith: aCart with: aClient with: aClock.! !
+
+
 !classDefinition: #Cashier category: #TusLibros!
 Object subclass: #Cashier
 	instanceVariableNames: 'salesBook merchantProcessor'
@@ -874,8 +1031,8 @@ signalExpiredCardCheckout
 	^ self error: self class checkingOutWithExpiredCardErrorDescription! !
 
 
-!Cashier methodsFor: 'checkout' stamp: 'DL 7/14/2020 18:25:30'!
-checkout: aCart with: aCard on: aDate 
+!Cashier methodsFor: 'checkout' stamp: 'DL 7/21/2020 18:41:53'!
+checkout: aCart from: aClient with: aCard on: aDate 
 	| subtotal |
 	
 	aCart isEmpty ifTrue: [ self signalEmptyCartCheckout ].
@@ -885,7 +1042,7 @@ checkout: aCart with: aCard on: aDate
 	
 	merchantProcessor debit: subtotal from: aCard.
 	
-	salesBook add: subtotal.
+	salesBook add: (Sale withItems: aCart listItems with: subtotal madeTo: aClient).
 		
 	^subtotal.
 ! !
@@ -916,6 +1073,54 @@ checkingOutWithExpiredCardErrorDescription
 with: aSalesBook with: aMerchantProcessor
 	
 	^self new initializeWith: aSalesBook with: aMerchantProcessor.! !
+
+
+!classDefinition: #Clock category: #TusLibros!
+Object subclass: #Clock
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+
+!classDefinition: #ClockSimulator category: #TusLibros!
+Clock subclass: #ClockSimulator
+	instanceVariableNames: 'date now'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!ClockSimulator methodsFor: 'as yet unclassified' stamp: 'DL 7/21/2020 21:51:43'!
+InitializeWith: aFixedGregorianDate
+
+	date := aFixedGregorianDate.
+	now := Duration zero.! !
+
+!ClockSimulator methodsFor: 'as yet unclassified' stamp: 'DL 7/21/2020 21:55:33'!
+advanceTime: aDuration 
+
+	now := now + aDuration.! !
+
+!ClockSimulator methodsFor: 'as yet unclassified' stamp: 'DL 7/21/2020 22:19:07'!
+now
+
+	^now! !
+
+!ClockSimulator methodsFor: 'as yet unclassified' stamp: 'DL 7/21/2020 22:33:09'!
+rewindTime: aDuration 
+
+	now := now - aDuration.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'ClockSimulator class' category: #TusLibros!
+ClockSimulator class
+	instanceVariableNames: ''!
+
+!ClockSimulator class methodsFor: 'as yet unclassified' stamp: 'DL 7/21/2020 21:36:34'!
+startingOn: aFixedGregorianDate
+
+	^self new InitializeWith: aFixedGregorianDate.! !
 
 
 !classDefinition: #MerchantProcessor category: #TusLibros!
@@ -961,25 +1166,67 @@ debitingWith: aBlock
 	^self new initializeWith: aBlock with: catalog.! !
 
 
-!classDefinition: #TusLibrosInterface category: #TusLibros!
-Object subclass: #TusLibrosInterface
-	instanceVariableNames: 'userAuthenticator carts lastCartId catalog salesBook merchantProcessor sales'
+!classDefinition: #Sale category: #TusLibros!
+Object subclass: #Sale
+	instanceVariableNames: 'soldItems subtotal client'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!TusLibrosInterface methodsFor: 'initialization' stamp: 'DL 7/20/2020 20:15:04'!
-initializeWith: anUserAuthenticator with: aCatalog with: aSalesBook with: aMerchantProcessor 
+!Sale methodsFor: 'as yet unclassified' stamp: 'DL 7/21/2020 18:46:40'!
+InitializeWith: items with: aSubtotal with: aClient
+
+	soldItems := items.
+	subtotal := aSubtotal.
+	client := aClient.! !
+
+!Sale methodsFor: 'as yet unclassified' stamp: 'DL 7/21/2020 19:05:35'!
+items
+
+	^soldItems.! !
+
+!Sale methodsFor: 'as yet unclassified' stamp: 'DL 7/21/2020 18:22:14'!
+subtotal
+
+	^subtotal! !
+
+!Sale methodsFor: 'as yet unclassified' stamp: 'DL 7/21/2020 19:04:30'!
+wasMadeTo: aClient 
+	
+	^client = aClient.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Sale class' category: #TusLibros!
+Sale class
+	instanceVariableNames: ''!
+
+!Sale class methodsFor: 'as yet unclassified' stamp: 'DL 7/21/2020 22:44:33'!
+withItems: items with: aSubtotal madeTo: aClient 
+
+	^self new InitializeWith: items with: aSubtotal with: aClient.! !
+
+
+!classDefinition: #TusLibrosInterface category: #TusLibros!
+Object subclass: #TusLibrosInterface
+	instanceVariableNames: 'userAuthenticator lastCartId catalog salesBook merchantProcessor clientIdByCartId sessions clock'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!TusLibrosInterface methodsFor: 'initialization' stamp: 'DL 7/21/2020 22:14:59'!
+initializeWith: anUserAuthenticator with: aCatalog with: aSalesBook with: aMerchantProcessor with: aClock  
 	userAuthenticator := anUserAuthenticator.
 	catalog := aCatalog.
 	
 	salesBook := aSalesBook.
 	merchantProcessor := aMerchantProcessor.
 	
-	carts := Dictionary new.
+	sessions := Dictionary new.
+	clientIdByCartId := Dictionary new.
 	lastCartId  := 0.
 	
-	sales := OrderedCollection new.! !
+	clock := aClock.! !
 
 
 !TusLibrosInterface methodsFor: 'private' stamp: 'DL 7/20/2020 20:27:21'!
@@ -987,14 +1234,14 @@ buildCashier
 
 	^ Cashier with: salesBook with: merchantProcessor.! !
 
-!TusLibrosInterface methodsFor: 'private' stamp: 'DL 7/20/2020 20:29:47'!
+!TusLibrosInterface methodsFor: 'private' stamp: 'DL 7/21/2020 22:29:19'!
 withCartId: aCartId do: aBlock
 	
-	| cart |
+	| session |
 	
-	cart := carts at: aCartId ifAbsent: [self signalCartNotFound].
+	session := sessions at: aCartId ifAbsent: [self signalActiveCartNotFound].
 	
-	^aBlock value: cart.! !
+	^session do: aBlock.! !
 
 
 !TusLibrosInterface methodsFor: 'interface messages' stamp: 'DL 7/20/2020 20:33:35'!
@@ -1002,25 +1249,24 @@ add: aQuantity of: anIsbn to: aCartId
 
 	self withCartId: aCartId do: [ :cart | cart add: aQuantity of: anIsbn].! !
 
-!TusLibrosInterface methodsFor: 'interface messages' stamp: 'DL 7/20/2020 20:32:20'!
+!TusLibrosInterface methodsFor: 'interface messages' stamp: 'DL 7/21/2020 22:29:52'!
 checkout: aCartId with: aCcn with: aCced with: aCco 
 	| card aCashier |
 	
 	card := self builCardWith: aCcn expiringOn: aCced from: aCco.
 	
-	self withCartId: aCartId do: [ :cart |
-			(sales includes: cart) ifTrue: [self signalCheckingOutCartTwice].
+	self withCartId: aCartId do: [ :cart | | aClientId |
 
 			aCashier := self buildCashier.
+			aClientId := clientIdByCartId at: aCartId.
 			
-			aCashier checkout: cart with: card on: FixedGregorianDate today. 
-			
-			sales add: cart.].
+			aCashier checkout: cart from: aClientId with: card on: FixedGregorianDate today. 
+			sessions removeKey: aCartId.].
 	
 	
 ! !
 
-!TusLibrosInterface methodsFor: 'interface messages' stamp: 'DL 7/20/2020 20:10:54'!
+!TusLibrosInterface methodsFor: 'interface messages' stamp: 'DL 7/21/2020 22:16:31'!
 createCart: aClientId authenticatingWith: aPassword 
 	
 	| newCartId |
@@ -1029,7 +1275,9 @@ createCart: aClientId authenticatingWith: aPassword
 	newCartId := lastCartId + 1.
 	lastCartId  := newCartId.
 	
-	carts at: newCartId put: (Cart acceptingItemsOf: catalog).
+	clientIdByCartId at: newCartId put: aClientId.
+	sessions at: newCartId put: (CartSession createWith: (Cart acceptingItemsOf: catalog) from: aClientId measuringTimeWith: clock).
+	
 	^newCartId.! !
 
 !TusLibrosInterface methodsFor: 'interface messages' stamp: 'DL 7/20/2020 20:34:46'!
@@ -1037,19 +1285,31 @@ listCart: aCartId
 
 	^ self withCartId: aCartId do: [:cart | cart listItems].! !
 
-!TusLibrosInterface methodsFor: 'interface messages' stamp: 'DL 7/20/2020 21:19:51'!
+!TusLibrosInterface methodsFor: 'interface messages' stamp: 'DL 7/21/2020 19:18:24'!
 listPurchases: aClientId authenticatingWith: aPassword 
 
+	| listPurchases salesByClient purchasesItems subtotal |
 	userAuthenticator authenticate: aClientId with: aPassword.
 	
-	^sales inject: Bag new into: [:acc :cart | acc addAll: cart listItems].
+	salesByClient := salesBook select: [:sale | sale wasMadeTo: aClientId].
+	
+	purchasesItems := salesByClient inject: Bag new into: [:acc :sale | acc addAll: sale items. acc].
+	
+	subtotal := salesByClient sum: [:sale | sale subtotal] ifEmpty: [0].
+	
+	listPurchases := Dictionary new.
+	
+	listPurchases at: 'purchasesItems' put: purchasesItems.
+	listPurchases at: 'totalPrice' put: subtotal.
+	
+	^listPurchases.
 	! !
 
 
-!TusLibrosInterface methodsFor: 'signals' stamp: 'MF 7/18/2020 19:36:50'!
-signalCartNotFound
+!TusLibrosInterface methodsFor: 'signals' stamp: 'DL 7/21/2020 19:49:01'!
+signalActiveCartNotFound
 
-	^ self error: self class cartNotFoundErrorDescription! !
+	^ self error: self class activeCartNotFoundErrorDescription! !
 
 !TusLibrosInterface methodsFor: 'signals' stamp: 'DL 7/20/2020 20:22:19'!
 signalCheckingOutCartTwice
@@ -1098,9 +1358,9 @@ validateCardCcn: aCcn
 TusLibrosInterface class
 	instanceVariableNames: ''!
 
-!TusLibrosInterface class methodsFor: 'as yet unclassified' stamp: 'MF 7/16/2020 20:02:35'!
-cartNotFoundErrorDescription
-	^'Cart not found'.! !
+!TusLibrosInterface class methodsFor: 'as yet unclassified' stamp: 'DL 7/21/2020 19:48:25'!
+activeCartNotFoundErrorDescription
+	^'Active cart was not found matching cartId'.! !
 
 !TusLibrosInterface class methodsFor: 'as yet unclassified' stamp: 'MF 7/20/2020 17:40:05'!
 checkingOutCartTwiceErrorDescription
@@ -1114,9 +1374,14 @@ invalidCcedErrorDescription
 invalidCcnErrorDescription
 	^'ccn can only have digits'.! !
 
-!TusLibrosInterface class methodsFor: 'as yet unclassified' stamp: 'MF 7/20/2020 16:27:37'!
-with: anUserAuthenticationServiceSimulator with: aCatalog with: aSalesBook with: aMerchantProcessor  
-	^self new initializeWith: anUserAuthenticationServiceSimulator with: aCatalog with: aSalesBook with: aMerchantProcessor.! !
+!TusLibrosInterface class methodsFor: 'as yet unclassified' stamp: 'DL 7/21/2020 22:32:30'!
+sessionExpiredErrorDescription
+
+	^'cannot operate when session is expired.'! !
+
+!TusLibrosInterface class methodsFor: 'as yet unclassified' stamp: 'DL 7/21/2020 22:15:38'!
+with: anUserAuthenticationServiceSimulator with: aCatalog with: aSalesBook with: aMerchantProcessor with: aClock   
+	^self new initializeWith: anUserAuthenticationServiceSimulator with: aCatalog with: aSalesBook with: aMerchantProcessor with: aClock.! !
 
 
 !classDefinition: #UserAuthenticationService category: #TusLibros!
@@ -1126,6 +1391,11 @@ Object subclass: #UserAuthenticationService
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
+!UserAuthenticationService methodsFor: 'authentication' stamp: 'DL 7/21/2020 19:57:40'!
+authenticate: aClientId with: aPassword
+
+	self subclassResponsibility.! !
+
 
 !classDefinition: #UserAuthenticationServiceSimulator category: #TusLibros!
 UserAuthenticationService subclass: #UserAuthenticationServiceSimulator
@@ -1134,12 +1404,12 @@ UserAuthenticationService subclass: #UserAuthenticationServiceSimulator
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!UserAuthenticationServiceSimulator methodsFor: 'initialization' stamp: 'MF 7/18/2020 17:16:26'!
-initializeWith: aBlock with: aCatalog  
+!UserAuthenticationServiceSimulator methodsFor: 'initialization' stamp: 'DL 7/21/2020 22:46:49'!
+initializeWith: aBlock 
 	authenticateBehaviour := aBlock.! !
 
 
-!UserAuthenticationServiceSimulator methodsFor: 'as yet unclassified' stamp: 'MF 7/16/2020 19:29:37'!
+!UserAuthenticationServiceSimulator methodsFor: 'authentication' stamp: 'MF 7/16/2020 19:29:37'!
 authenticate: aClientId with: aPassword
 	^authenticateBehaviour value: aClientId value: aPassword.
 	! !
@@ -1150,6 +1420,6 @@ authenticate: aClientId with: aPassword
 UserAuthenticationServiceSimulator class
 	instanceVariableNames: ''!
 
-!UserAuthenticationServiceSimulator class methodsFor: 'as yet unclassified' stamp: 'MF 7/18/2020 17:16:26'!
-authenticatingWith: aBlockClosure 
-	^self new initializeWith: aBlockClosure with: catalog.! !
+!UserAuthenticationServiceSimulator class methodsFor: 'as yet unclassified' stamp: 'DL 7/21/2020 22:46:33'!
+authenticatingWith: aBlock 
+	^self new initializeWith: aBlock.! !
