@@ -346,8 +346,7 @@ TestCase subclass: #TusLibrosInterfaceTest
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:31:57'!
+!TusLibrosInterfaceTest methodsFor: 'support' stamp: 'DL 7/21/2020 20:31:57'!
 assert: aClient withPassword: aPassword boughtAQuantityOf: anAmountOfProduct1 on: aTusLibrosInterface 
 
 	self assert: anAmountOfProduct1 equals: (((aTusLibrosInterface listPurchases: aClient authenticatingWith: aPassword) at: 'purchasesItems') occurrencesOf: product1).
@@ -355,8 +354,9 @@ assert: aClient withPassword: aPassword boughtAQuantityOf: anAmountOfProduct1 on
 	self assert: product1Price*anAmountOfProduct1 equals: ((aTusLibrosInterface listPurchases: aClient authenticatingWith: aPassword) at: 'totalPrice').
 	! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 22:15:34'!
-test01
+
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/22/2020 20:52:19'!
+test01cannotCreateCartAnUserNotAuthenticated
 
 	| clientId password tusLibros |
 	
@@ -371,86 +371,8 @@ test01
 	
 	! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:08:39'!
-test02
-
-	| clientId password tusLibros cartId |
-	
-	tusLibros := self buildInterface.
-	clientId := '1'.
-	password := '1234'.
-	
-	cartId := tusLibros createCart: clientId authenticatingWith: password.
-
-	self assert: (tusLibros listCart: cartId) isEmpty
-	
-	! !
-
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:10:02'!
-test03
-
-	| tusLibros |
-	
-	tusLibros := self buildInterface.
-
-	self should: [ tusLibros listCart: Object new ]
-	raise: Error - MessageNotUnderstood
-	withMessageText: TusLibrosInterface activeCartNotFoundErrorDescription.
-	
-	! !
-
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:10:42'!
-test04
-
-	| clientId password tusLibros cartId cartId2 |
-	
-	tusLibros := self buildInterface.
-	clientId := '1'.
-	password := '1234'.
-	
-	cartId := tusLibros createCart: clientId authenticatingWith: password.
-	cartId2 := tusLibros createCart: clientId authenticatingWith: password.
-
-	self assert: cartId ~= cartId2.
-
-	
-	! !
-
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:11:02'!
-test05
-
-	| tusLibros  |
-	
-	tusLibros := self buildInterface.
-
-	self should: [ tusLibros add: 1 of: 1 to: Object new ]
-	raise: Error - MessageNotUnderstood
-	withMessageText: TusLibrosInterface activeCartNotFoundErrorDescription.
-
-	
-	! !
-
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:11:35'!
-test06
-
-	| clientId password tusLibros cartId |
-	
-	tusLibros := self buildInterface.
-	clientId := '1'.
-	password := '1234'.
-	
-	cartId := tusLibros createCart: clientId authenticatingWith: password.
-
-	tusLibros add: 1 of: 1 to: cartId.
-
-	self assert: (tusLibros listCart: cartId) includes: 1.
-	self assert: 1 equals: (tusLibros listCart: cartId) size.
-
-	
-	! !
-
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 22:15:34'!
-test07
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/22/2020 21:02:33'!
+test02cannotListPurchasesAnUserNotAuthenticated
 
 	| clientId password tusLibros |
 	
@@ -465,8 +387,35 @@ test07
 	
 	! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:31:58'!
-test08
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/22/2020 21:02:50'!
+test03cannotListCartWhenCartNotCreated
+
+	| tusLibros |
+	
+	tusLibros := self buildInterface.
+
+	self should: [ tusLibros listCart: Object new ]
+	raise: Error - MessageNotUnderstood
+	withMessageText: TusLibrosInterface activeCartNotFoundErrorDescription.
+	
+	! !
+
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/22/2020 22:11:57'!
+test04cannotAddItemToCartWhenCartNotCreated
+
+	| tusLibros  |
+	
+	tusLibros := self buildInterface.
+
+	self should: [ tusLibros add: 1 of: product1 to: Object new ]
+	raise: Error - MessageNotUnderstood
+	withMessageText: TusLibrosInterface activeCartNotFoundErrorDescription.
+
+	
+	! !
+
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/22/2020 21:12:29'!
+test05cannotCheckoutWithACartNotcreated
 
 	| tusLibros clientId password |
 	
@@ -484,8 +433,59 @@ test08
 	
 	! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:36:16'!
-test09
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/22/2020 21:12:38'!
+test06listCartShouldBeEmptyWhenCreateCart
+
+	| clientId password tusLibros cartId |
+	
+	tusLibros := self buildInterface.
+	clientId := '1'.
+	password := '1234'.
+	
+	cartId := tusLibros createCart: clientId authenticatingWith: password.
+
+	self assert: (tusLibros listCart: cartId) isEmpty
+	
+	! !
+
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/22/2020 21:04:40'!
+test07createTwoCartsMustHaveDifferentIds
+
+	| clientId password tusLibros cartId cartId2 |
+	
+	tusLibros := self buildInterface.
+	clientId := '1'.
+	password := '1234'.
+	
+	cartId := tusLibros createCart: clientId authenticatingWith: password.
+	cartId2 := tusLibros createCart: clientId authenticatingWith: password.
+
+	self assert: cartId ~= cartId2.
+
+	
+	! !
+
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/22/2020 22:12:15'!
+test08whenCreateCartAndAddOneItemMustHaveOnlyThatItem
+
+	| clientId password tusLibros cartId |
+	
+	tusLibros := self buildInterface.
+	clientId := '1'.
+	password := '1234'.
+	
+	cartId := tusLibros createCart: clientId authenticatingWith: password.
+
+	tusLibros add: 1 of: product1 to: cartId.
+
+	self assert: (tusLibros listCart: cartId) includes: 1.
+	self assert: 1 equals: (tusLibros listCart: cartId) size.
+
+	
+	! !
+
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/22/2020 22:06:21'!
+test09cannotCheckoutWithACharacterOnCcn
 
 	| clientId password tusLibros cartId  |
 	
@@ -504,8 +504,8 @@ test09
 	].	
 	! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:36:50'!
-test10
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/22/2020 21:19:51'!
+test10cannotCheckoutWhenCcedHaveInvalidFormat
 
 	| clientId password tusLibros cartId  |
 	
@@ -524,27 +524,8 @@ test10
 	].	
 	! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:37:14'!
-test11
-
-	| clientId password tusLibros cartId |
-	
-	tusLibros := self buildInterface.
-	clientId := '1'.
-	password := '1234'.
-	
-	cartId := tusLibros createCart: clientId authenticatingWith: password.
-
-	self should: [ tusLibros checkout: cartId with: '1111111111111111' with: '12-2020'  with: 'Edgar' ]
-	raise: Error - MessageNotUnderstood
-	withExceptionDo: [:anError |
-		self assert: (TusLibrosInterface invalidCcedErrorDescription) equals: anError messageText.
-		self assert: clientId withPassword: password boughtAQuantityOf: 0 on: tusLibros.
-	].	
-	! !
-
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:37:38'!
-test12
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/22/2020 21:28:38'!
+test11ShouldFailWhenUseCcedWithThreeDigitsForMonthAndYear
 
 	| clientId password tusLibros cartId  |
 	
@@ -562,8 +543,8 @@ test12
 	].	
 	! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:38:11'!
-test13
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/22/2020 21:32:25'!
+test12ShouldFailWhenUseCcedWithNoDigitInYear
 
 	| clientId password tusLibros cartId |
 	
@@ -581,8 +562,8 @@ test13
 	].	
 	! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:39:17'!
-test14
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/22/2020 21:32:40'!
+test13ShouldFailWhenUseCcedWithNoDigitInMoth
 
 	| clientId password tusLibros cartId |
 	
@@ -600,8 +581,48 @@ test14
 	].	
 	! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:39:45'!
-test15
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/22/2020 22:12:55'!
+test14cannotCheckoutWithExpiredCard
+
+	| clientId password tusLibros cartId |
+	
+	tusLibros := self buildInterface.
+	clientId := '1'.
+	password := '1234'.
+	
+	cartId := tusLibros createCart: clientId authenticatingWith: password.
+	tusLibros add: 1 of: product1 to: cartId.
+	
+	self should: [tusLibros checkout: cartId with: '1111111111111111' with: '12/1990'  with: 'Edgar'.]
+	raise: Error - MessageNotUnderstood
+	withExceptionDo: [:anError | 
+		self assert: Cashier checkingOutWithExpiredCardErrorDescription equals: anError messageText.
+		self assert: clientId withPassword: password boughtAQuantityOf: 0 on: tusLibros.
+		
+		]! !
+
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/22/2020 22:13:01'!
+test15cannotCheckoutWithInvalidCardNumber
+
+	| clientId password tusLibros cartId |
+	
+	tusLibros := self buildInterface.
+	clientId := '1'.
+	password := '1234'.
+	
+	cartId := tusLibros createCart: clientId authenticatingWith: password.
+	tusLibros add: 1 of: product1 to: cartId.
+	
+	self should: [tusLibros checkout: cartId with: '111111111111111' with: '12/2030'  with: 'Edgar'.]
+	raise: Error - MessageNotUnderstood
+	withExceptionDo: [:anError | 
+		self assert: Card invalidCardNumberErrorDescription equals: anError messageText.
+		self assert: clientId withPassword: password boughtAQuantityOf: 0 on: tusLibros.
+		
+		]! !
+
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/22/2020 22:06:55'!
+test16cannotCheckoutWhenCartIsEmpty
 
 	| clientId password tusLibros cartId |
 
@@ -614,13 +635,13 @@ test15
 	self should: [ tusLibros checkout: cartId with: '1111111111111111' with: '12/2030'  with: 'Edgar' ]
 	raise: Error - MessageNotUnderstood
 	withExceptionDo: [:anError |
-		self assert: 'Cannot checkout empty cart' equals: anError messageText.
+		self assert: Cashier checkingOutEmptyCartErrorDescription equals: anError messageText.
 		self assert: clientId withPassword: password boughtAQuantityOf: 0 on: tusLibros.
 	].	
 	! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:40:28'!
-test16
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/22/2020 22:13:15'!
+test17whenClientCheckoutAItemMustHaveThatItemOnListPurchases
 
 	| clientId password tusLibros cartId |
 	
@@ -629,14 +650,14 @@ test16
 	password := '1234'.
 	
 	cartId := tusLibros createCart: clientId authenticatingWith: password.
-	tusLibros add: 1 of: 1 to: cartId.
+	tusLibros add: 1 of: product1 to: cartId.
 	tusLibros checkout: cartId with: '1111111111111111' with: '12/2030'  with: 'Edgar'.
 	
 	self assert: clientId withPassword: password boughtAQuantityOf: 1 on: tusLibros.
 	! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:41:10'!
-test17
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/22/2020 22:13:25'!
+test18cannotCheckoutTwiceWithSameCart
 
 	| clientId password tusLibros cartId |
 	
@@ -645,7 +666,7 @@ test17
 	password := '1234'.
 	
 	cartId := tusLibros createCart: clientId authenticatingWith: password.
-	tusLibros add: 1 of: 1 to: cartId.
+	tusLibros add: 1 of: product1 to: cartId.
 	tusLibros checkout: cartId with: '1111111111111111' with: '12/2030'  with: 'Edgar'.
 	
 	self should: [ tusLibros checkout: cartId with: '1111111111111111' with: '12/2030'  with: 'Edgar'. ]
@@ -655,8 +676,8 @@ test17
 		self assert: clientId withPassword: password boughtAQuantityOf: 1 on: tusLibros.
 	]	! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:42:08'!
-test18
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/22/2020 22:13:35'!
+test19whenCheckoutInDifferentsCartsAllItemsMustBeOnListPurchases
 
 	| clientId password tusLibros cartId1 cartId2 clientPurchases |
 	
@@ -666,8 +687,8 @@ test18
 	
 	cartId1 := tusLibros createCart: clientId authenticatingWith: password.
 	cartId2 := tusLibros createCart: clientId authenticatingWith: password.
-	tusLibros add: 1 of: 1 to: cartId1.
-	tusLibros add: 1 of: 1 to: cartId2.
+	tusLibros add: 1 of: product1 to: cartId1.
+	tusLibros add: 1 of: product1 to: cartId2.
 	tusLibros checkout: cartId1 with: '1111111111111111' with: '12/2030'  with: 'Edgar'.
 	tusLibros checkout: cartId2 with: '1111111111111111' with: '12/2030'  with: 'Edgar'.
 	
@@ -676,8 +697,8 @@ test18
 	self assert: clientId withPassword: password boughtAQuantityOf: 2 on: tusLibros.
 	! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:43:15'!
-test19
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/22/2020 22:13:53'!
+test20twoClientsMustBeDifferentsListPurchases
 
 	| tusLibros cartId1 cartId2 clientId1 clientId2 password1 password2 |
 	
@@ -690,8 +711,8 @@ test19
 	
 	cartId1 := tusLibros createCart: clientId1 authenticatingWith: password1.
 	cartId2 := tusLibros createCart: clientId2 authenticatingWith: password2.
-	tusLibros add: 2 of: 1 to: cartId1.
-	tusLibros add: 1 of: 1 to: cartId2.
+	tusLibros add: 2 of: product1 to: cartId1.
+	tusLibros add: 1 of: product1 to: cartId2.
 	tusLibros checkout: cartId1 with: '1111111111111111' with: '12/2030'  with: 'Edgar'.
 	tusLibros checkout: cartId2 with: '2222222222222222' with: '12/2020'  with: 'Jose'.
 	
@@ -699,8 +720,8 @@ test19
 	self assert: clientId2 withPassword: password2 boughtAQuantityOf: 1 on: tusLibros.
 ! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:43:47'!
-test20
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/22/2020 22:14:04'!
+test21whenCheckoutWithACartCannotAddMoreItemsThatCart
 
 	| clientId password tusLibros cartId |
 	
@@ -709,15 +730,15 @@ test20
 	password := '1234'.
 	
 	cartId := tusLibros createCart: clientId authenticatingWith: password.
-	tusLibros add: 1 of: 1 to: cartId.
+	tusLibros add: 1 of: product1 to: cartId.
 	tusLibros checkout: cartId with: '1111111111111111' with: '12/2030'  with: 'Edgar'.
 	
-	self should: [tusLibros add: 1 of: 1 to: cartId.]
+	self should: [tusLibros add: 1 of: product1 to: cartId.]
 	raise: Error - MessageNotUnderstood
 	withMessageText: TusLibrosInterface activeCartNotFoundErrorDescription.! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:45:48'!
-test21
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/22/2020 22:14:12'!
+test22whenCheckoutWithACartCannotLisThatCart
 
 	| clientId password tusLibros cartId |
 	
@@ -726,55 +747,15 @@ test21
 	password := '1234'.
 	
 	cartId := tusLibros createCart: clientId authenticatingWith: password.
-	tusLibros add: 1 of: 1 to: cartId.
+	tusLibros add: 1 of: product1 to: cartId.
 	tusLibros checkout: cartId with: '1111111111111111' with: '12/2030'  with: 'Edgar'.
 	
 	self should: [tusLibros listCart: cartId.]
 	raise: Error - MessageNotUnderstood
 	withMessageText: TusLibrosInterface activeCartNotFoundErrorDescription.! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:52:00'!
-test22
-
-	| clientId password tusLibros cartId |
-	
-	tusLibros := self buildInterface.
-	clientId := '1'.
-	password := '1234'.
-	
-	cartId := tusLibros createCart: clientId authenticatingWith: password.
-	tusLibros add: 1 of: 1 to: cartId.
-	
-	self should: [tusLibros checkout: cartId with: '1111111111111111' with: '12/1990'  with: 'Edgar'.]
-	raise: Error - MessageNotUnderstood
-	withExceptionDo: [:anError | 
-		self assert: Cashier checkingOutWithExpiredCardErrorDescription equals: anError messageText.
-		self assert: clientId withPassword: password boughtAQuantityOf: 0 on: tusLibros.
-		
-		]! !
-
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 20:53:17'!
-test23
-
-	| clientId password tusLibros cartId |
-	
-	tusLibros := self buildInterface.
-	clientId := '1'.
-	password := '1234'.
-	
-	cartId := tusLibros createCart: clientId authenticatingWith: password.
-	tusLibros add: 1 of: 1 to: cartId.
-	
-	self should: [tusLibros checkout: cartId with: '111111111111111' with: '12/2030'  with: 'Edgar'.]
-	raise: Error - MessageNotUnderstood
-	withExceptionDo: [:anError | 
-		self assert: Card invalidCardNumberErrorDescription equals: anError messageText.
-		self assert: clientId withPassword: password boughtAQuantityOf: 0 on: tusLibros.
-		
-		]! !
-
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 22:31:41'!
-test24
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/22/2020 22:14:19'!
+test23cannotAddItemWhenSessionExpired
 
 	| clientId password tusLibros cartId |
 	
@@ -786,7 +767,7 @@ test24
 	
 	clock advanceTime: (30 minutes + 1 seconds).
 	
-	self should: [tusLibros add: 1 of: 1 to: cartId.]
+	self should: [tusLibros add: 1 of: product1 to: cartId.]
 	raise: Error - MessageNotUnderstood
 	withMessageText: [TusLibrosInterface sessionExpiredErrorDescription].
 	
@@ -794,8 +775,8 @@ test24
 	(tusLibros listCart: cartId) isEmpty. 
 	! !
 
-!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/21/2020 22:40:23'!
-test25
+!TusLibrosInterfaceTest methodsFor: 'tests' stamp: 'DL 7/22/2020 22:10:41'!
+test24whenUseCartTheSessionNotExpired
 
 	| clientId password tusLibros cartId |
 	
