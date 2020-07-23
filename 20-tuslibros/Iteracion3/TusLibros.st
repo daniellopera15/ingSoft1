@@ -1252,9 +1252,9 @@ add: aQuantity of: anIsbn to: aCartId
 
 	self withCartId: aCartId do: [ :cart | cart add: aQuantity of: anIsbn].! !
 
-!TusLibrosInterface methodsFor: 'interface messages' stamp: 'MF 7/23/2020 13:37:35'!
+!TusLibrosInterface methodsFor: 'interface messages' stamp: 'MF 7/23/2020 15:25:26'!
 checkout: aCartId with: aCcn with: aCced with: aCco 
-	| card aCashier |
+	| card aCashier transactionId |
 	
 	card := self builCardWith: aCcn expiringOn: aCced from: aCco.
 	
@@ -1265,6 +1265,9 @@ checkout: aCartId with: aCcn with: aCced with: aCco
 			
 			aCashier checkout: cart from: aClientId with: card on: clock today. 
 			sessions removeKey: aCartId.].
+		
+	transactionId := salesBook size + 1.
+	^transactionId.
 	
 	
 ! !
